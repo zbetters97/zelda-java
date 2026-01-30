@@ -130,6 +130,10 @@ public class Entity {
         manageValues();
     }
 
+    public GamePanel.Direction resolveMoveDirection() {
+        return direction;
+    }
+
     /**
      * MANAGE VALUES
      * Resets or reassigns entity attributes

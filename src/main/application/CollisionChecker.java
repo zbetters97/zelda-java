@@ -40,7 +40,8 @@ public record CollisionChecker(GamePanel gp) {
         int tileNum1 = 0, tileNum2 = 0;
 
         // Find tile player will interact with, factoring in speed
-        GamePanel.Direction direction = entity.direction;
+        GamePanel.Direction direction = entity.resolveMoveDirection();
+
         switch (direction) {
             case UP:
                 entityTopRow = (entityTopWorldY - entity.speed) / gp.tileSize;

@@ -31,8 +31,8 @@ public class Player extends Entity {
 
     /* SPRITE IMAGES */
     private BufferedImage
-            attackUp1, attackUp2, attackUp3, attackDown1, attackDown2, attackDown3,
-            attackLeft1, attackLeft2, attackLeft3, attackRight1, attackRight2, attackRight3,
+            attackUp1, attackUp2, attackUp3, attackUp4, attackDown1, attackDown2, attackDown3, attackDown4,
+            attackLeft1, attackLeft2, attackLeft3, attackLeft4, attackRight1, attackRight2, attackRight3, attackRight4,
 
             spinUp1, spinUp2, spinDown1, spinDown2,
             spinLeft1, spinLeft2, spinRight1, spinRight2,
@@ -90,15 +90,19 @@ public class Player extends Entity {
         attackUp1 = setupImage("/player/boy_attack_kokiri_up_1", gp.tileSize * 2, gp.tileSize);
         attackUp2 = setupImage("/player/boy_attack_kokiri_up_2", gp.tileSize * 2, gp.tileSize * 2);
         attackUp3 = setupImage("/player/boy_attack_kokiri_up_3", gp.tileSize, gp.tileSize * 2);
+        attackUp4 = setupImage("/player/boy_attack_kokiri_up_4", gp.tileSize, gp.tileSize * 2);
         attackDown1 = setupImage("/player/boy_attack_kokiri_down_1", gp.tileSize * 2, gp.tileSize);
         attackDown2 = setupImage("/player/boy_attack_kokiri_down_2", gp.tileSize * 2, gp.tileSize * 2);
         attackDown3 = setupImage("/player/boy_attack_kokiri_down_3", gp.tileSize, gp.tileSize * 2);
+        attackDown4 = setupImage("/player/boy_attack_kokiri_down_4", gp.tileSize, gp.tileSize * 2);
         attackLeft1 = setupImage("/player/boy_attack_kokiri_left_1", gp.tileSize, gp.tileSize * 2);
         attackLeft2 = setupImage("/player/boy_attack_kokiri_left_2", gp.tileSize * 2, gp.tileSize * 2);
         attackLeft3 = setupImage("/player/boy_attack_kokiri_left_3", gp.tileSize * 2, gp.tileSize);
+        attackLeft4 = setupImage("/player/boy_attack_kokiri_left_4", gp.tileSize * 2, gp.tileSize);
         attackRight1 = setupImage("/player/boy_attack_kokiri_right_1", gp.tileSize, gp.tileSize * 2);
         attackRight2 = setupImage("/player/boy_attack_kokiri_right_2", gp.tileSize * 2, gp.tileSize * 2);
         attackRight3 = setupImage("/player/boy_attack_kokiri_right_3", gp.tileSize * 2, gp.tileSize);
+        attackRight4 = setupImage("/player/boy_attack_kokiri_right_4", gp.tileSize * 2, gp.tileSize);
     }
     private void getSpinImages() {
         spinUp1 = setupImage("/player/boy_spin_kokiri_up_1", gp.tileSize * 2, gp.tileSize * 2);
@@ -377,7 +381,7 @@ public class Player extends Entity {
      * Decides if direction or lockonDirection should be used
      * Called by move()
      */
-    private GamePanel.Direction resolveMoveDirection() {
+    public GamePanel.Direction resolveMoveDirection() {
         if (action == Action.ROLLING || lockedOn) {
             return lockonDirection;
         }
@@ -388,13 +392,14 @@ public class Player extends Entity {
     /**
      * CYCLE SPRITES
      * Changes the animation counter for draw to render the correct sprite
+     * Called by updateDirection()
      */
     protected void cycleSprites() {
 
         spriteCounter++;
         if (spriteCounter > animationSpeed) {
 
-            // CYCLE WALKING/SWIMMING SPRITES
+            // Cycle walking sprites
             if (spriteNum == 1) {
                 spriteNum = 2;
             }
@@ -733,7 +738,14 @@ public class Player extends Entity {
                 attackSprite = switch (attackNum) {
                     case 1 -> attackUp1;
                     case 2 -> attackUp2;
-                    case 3 -> attackUp3;
+                    case 3 -> {
+                        if (spriteNum == 1) {
+                            yield attackUp3;
+                        }
+                        else {
+                            yield attackUp4;
+                        }
+                    }
                     default -> attackSprite;
                 };
             }
@@ -744,7 +756,14 @@ public class Player extends Entity {
                 attackSprite = switch (attackNum) {
                     case 1 -> attackDown1;
                     case 2 -> attackDown2;
-                    case 3 -> attackDown3;
+                    case 3 -> {
+                        if (spriteNum == 1) {
+                            yield attackDown3;
+                        }
+                        else {
+                            yield attackDown4;
+                        }
+                    }
                     default -> attackSprite;
                 };
             }
@@ -758,7 +777,14 @@ public class Player extends Entity {
                 attackSprite = switch (attackNum) {
                     case 1 -> attackLeft1;
                     case 2 -> attackLeft2;
-                    case 3 -> attackLeft3;
+                    case 3 -> {
+                        if (spriteNum == 1) {
+                           yield attackLeft3;
+                        }
+                        else {
+                            yield attackLeft4;
+                        }
+                    }
                     default -> attackSprite;
                 };
             }
@@ -769,7 +795,14 @@ public class Player extends Entity {
                 attackSprite = switch (attackNum) {
                     case 1 -> attackRight1;
                     case 2 -> attackRight2;
-                    case 3 -> attackRight3;
+                    case 3 -> {
+                        if (spriteNum == 1) {
+                            yield attackRight3;
+                        }
+                        else {
+                            yield attackRight4;
+                        }
+                    }
                     default -> attackSprite;
                 };
             }
