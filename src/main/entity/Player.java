@@ -25,9 +25,6 @@ public class Player extends Entity {
     /* ANIMATION HANDLERS */
     private int coolDownCounter = 0;
     private int attackNum = 1, attackCounter = 0;
-    private int spinNum = 0;
-    private int rollNum = 1, rollCounter = 0;
-    private int guardNum = 1, guardCounter = 0;
 
     /* SPRITE IMAGES */
     private BufferedImage
@@ -231,6 +228,8 @@ public class Player extends Entity {
         // Shield guard
         else if (gp.keyH.rPressed) {
             action = Action.GUARDING;
+            spriteNum = 1;
+            spriteCounter = 0;
         }
     }
 
@@ -243,17 +242,28 @@ public class Player extends Entity {
 
         gp.keyH.aPressed = false;
 
+        // Different action based on current status
         switch (action) {
-            // Different action based on current status
             case IDLE -> {
                 // Cooldown needed for rolling
                 if (moving && coolDownCounter == 0) {
-                    action = Action.ROLLING;
-                    lockonDirection = direction;
-                    coolDownCounter = 30;
+                    startRoll();
                 }
             }
         }
+    }
+
+    /**
+     * START ROLL
+     * Initiates roll logic
+     * Called by startAction() when player initiates ROLL
+     */
+    private void startRoll() {
+        action = Action.ROLLING;
+        spriteNum = 1;
+        spriteCounter = 0;
+        lockonDirection = direction;
+        coolDownCounter = 30;
     }
 
     /**
@@ -505,6 +515,7 @@ public class Player extends Entity {
             charge = 0;
             lockedOn = false;
             attackNum = 1;
+            spriteNum = 0;
             speed = defaultSpeed;
             action = Action.SPINNING;
         }
@@ -545,23 +556,7 @@ public class Player extends Entity {
         }
         else if (attackCounter < 6) {
             attackNum = 2;
-
-            // TODO: Adjust world X/Y to detect if enemies are in range of spin attack
-            switch (direction) {
-                case UP, UPLEFT, UPRIGHT, DOWN, DOWNLEFT, DOWNRIGHT -> {
-                    hitbox.height = attackBox.height;
-                    hitbox.width *= 2;
-                }
-                case LEFT, RIGHT -> {
-                    hitbox.width = attackBox.width;
-                    hitbox.height *= 2;
-                }
-            }
-            // TODO: Detect if enemies hit by spin attack
-
-            // TODO: Reset world X/Y
-            hitbox.width = hitboxDefaultWidth;
-            hitbox.height = hitboxDefaultHeight;
+            adjustSpinHitbox();
         }
         else {
             // Reset sprite counter to animate attack for all 4 directions
@@ -569,17 +564,41 @@ public class Player extends Entity {
             attackCounter = 0;
 
             // Full rotation
-            if (spinNum < 3) {
+            if (spriteNum < 3) {
                updateSpinDirection();
             }
 
             // Run 4 times for 4 directions, then stop spin
-            spinNum++;
-            if (spinNum == 4) {
-                spinNum = 0;
+            spriteNum++;
+            if (spriteNum == 4) {
+                spriteNum = 1;
                 action = Action.IDLE;
             }
         }
+    }
+
+    /**
+     * ADJUST SPIN HITBOX
+     * Modifies hitbox to accommodate for spin attack
+     * Called by spinning()
+     */
+    private void adjustSpinHitbox() {
+        // TODO: Adjust world X/Y to detect if enemies are in range of spin attack
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT, DOWN, DOWNLEFT, DOWNRIGHT -> {
+                hitbox.height = attackBox.height;
+                hitbox.width *= 2;
+            }
+            case LEFT, RIGHT -> {
+                hitbox.width = attackBox.width;
+                hitbox.height *= 2;
+            }
+        }
+        // TODO: Detect if enemies hit by spin attack
+
+        // TODO: Reset world X/Y
+        hitbox.width = hitboxDefaultWidth;
+        hitbox.height = hitboxDefaultHeight;
     }
 
     /**
@@ -591,22 +610,22 @@ public class Player extends Entity {
 
         speed = 5;
 
-        rollCounter++;
-        if (6 > rollCounter) {
-            rollNum = 1;
+        spriteCounter++;
+        if (6 > spriteCounter) {
+            spriteNum = 1;
         }
-        else if (10 > rollCounter) {
-            rollNum = 2;
+        else if (10 > spriteCounter) {
+            spriteNum = 2;
         }
-        else if (15 > rollCounter) {
-            rollNum = 3;
+        else if (15 > spriteCounter) {
+            spriteNum = 3;
         }
-        else if (20 > rollCounter) {
-            rollNum = 4;
+        else if (20 > spriteCounter) {
+            spriteNum = 4;
         }
         else {
-            rollNum = 1;
-            rollCounter = 0;
+            spriteNum = 1;
+            spriteCounter = 0;
             action = Action.IDLE;
             speed = defaultSpeed;
         }
@@ -621,20 +640,20 @@ public class Player extends Entity {
 
         // Activate guard when R is held down
         if (gp.keyH.rPressed) {
-            if (guardCounter < 15) {
-                guardCounter++;
+            if (spriteCounter < 15) {
+                spriteCounter++;
             }
 
-            if (guardCounter < 7) {
-                guardNum = 1;
+            if (spriteCounter < 7) {
+                spriteNum = 1;
             } else {
-                guardNum = 2;
+                spriteNum = 2;
             }
         }
         // Release guard when player releases R
         else {
-            guardNum = 1;
-            guardCounter = 0;
+            spriteNum = 1;
+            spriteCounter = 0;
             action = Action.IDLE;
         }
     }
@@ -720,7 +739,7 @@ public class Player extends Entity {
                 case LEFT -> left1;
                 case RIGHT -> right1;
             };
-        } else if (spriteNum == 2) {
+        } else {
             idleSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> up2;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> down2;
@@ -863,28 +882,28 @@ public class Player extends Entity {
         BufferedImage rollingSprite = rollUp1;
 
         rollingSprite = switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> switch (rollNum) {
+            case UP, UPLEFT, UPRIGHT -> switch (spriteNum) {
                 case 1 -> rollUp1;
                 case 2 -> rollUp2;
                 case 3 -> rollUp3;
                 case 4 -> rollUp4;
                 default -> rollingSprite;
             };
-            case DOWN, DOWNLEFT, DOWNRIGHT -> switch (rollNum) {
+            case DOWN, DOWNLEFT, DOWNRIGHT -> switch (spriteNum) {
                 case 1 -> rollDown1;
                 case 2 -> rollDown2;
                 case 3 -> rollDown3;
                 case 4 -> rollDown4;
                 default -> rollingSprite;
             };
-            case LEFT -> switch (rollNum) {
+            case LEFT -> switch (spriteNum) {
                 case 1 -> rollLeft1;
                 case 2 -> rollLeft2;
                 case 3 -> rollLeft3;
                 case 4 -> rollLeft4;
                 default -> rollingSprite;
             };
-            case RIGHT -> switch (rollNum) {
+            case RIGHT -> switch (spriteNum) {
                 case 1 -> rollRight1;
                 case 2 -> rollRight2;
                 case 3 -> rollRight3;
@@ -898,7 +917,7 @@ public class Player extends Entity {
     private BufferedImage getGuardSprite() {
         BufferedImage guardSprite;
 
-        if (guardNum == 1) {
+        if (spriteNum == 1) {
             guardSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> guardUp1;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> guardDown1;
