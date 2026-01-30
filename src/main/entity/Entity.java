@@ -130,7 +130,7 @@ public class Entity {
         manageValues();
     }
 
-    public GamePanel.Direction resolveMoveDirection() {
+    public GamePanel.Direction getMoveDirection() {
         return direction;
     }
 

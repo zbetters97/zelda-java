@@ -349,7 +349,7 @@ public class Player extends Entity {
         }
 
         moving = true;
-        GamePanel.Direction newDirection = resolveMoveDirection();
+        GamePanel.Direction newDirection = getMoveDirection();
 
         switch (newDirection) {
             case UP -> worldY -= speed;
@@ -381,7 +381,7 @@ public class Player extends Entity {
      * Decides if direction or lockonDirection should be used
      * Called by move()
      */
-    public GamePanel.Direction resolveMoveDirection() {
+    public GamePanel.Direction getMoveDirection() {
         if (action == Action.ROLLING || lockedOn) {
             return lockonDirection;
         }
@@ -493,19 +493,14 @@ public class Player extends Entity {
 
         // Player holding B to charge
         if (gp.keyH.bPressed) {
-            if (charge < 119) {
+            if (charge < 120) {
                 charge += 2;
             }
             speed = 2;
         }
         // Charge is ready, start spin and reset values
         else if (charge >= 120) {
-            direction = switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> LEFT;
-                case DOWN, DOWNLEFT, DOWNRIGHT -> RIGHT;
-                case LEFT -> DOWN;
-                case RIGHT -> UP;
-            };
+            updateSpinDirection();
 
             charge = 0;
             lockedOn = false;
@@ -521,6 +516,20 @@ public class Player extends Entity {
             lockedOn = false;
             action = Action.IDLE;
         }
+    }
+
+    /**
+     * UPDATE SPIN DIRECTION
+     * Assigns new direction using counter-clockwise rotation
+     * Called by charging() and spinning()
+     */
+    private void updateSpinDirection() {
+        direction = switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> LEFT;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> RIGHT;
+            case LEFT -> DOWN;
+            case RIGHT -> UP;
+        };
     }
 
     /**
@@ -559,14 +568,9 @@ public class Player extends Entity {
             attackNum = 1;
             attackCounter = 0;
 
-            // Full counter-clockwise rotation
+            // Full rotation
             if (spinNum < 3) {
-               direction = switch (direction) {
-                   case UP, UPLEFT, UPRIGHT -> LEFT;
-                   case DOWN, DOWNLEFT, DOWNRIGHT -> RIGHT;
-                   case LEFT -> DOWN;
-                   case RIGHT -> UP;
-               };
+               updateSpinDirection();
             }
 
             // Run 4 times for 4 directions, then stop spin
@@ -588,7 +592,7 @@ public class Player extends Entity {
         speed = 5;
 
         rollCounter++;
-        if (5 >= rollCounter) {
+        if (6 > rollCounter) {
             rollNum = 1;
         }
         else if (10 > rollCounter) {
@@ -614,6 +618,7 @@ public class Player extends Entity {
      * Called by getAction() when action = GUARDING
      */
     private void guarding() {
+
         // Activate guard when R is held down
         if (gp.keyH.rPressed) {
             if (guardCounter < 15) {
