@@ -6,8 +6,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 public class Entity {
@@ -17,7 +15,7 @@ public class Entity {
         ATTACKING(false, false),
         CHARGING(true, true),
         SPINNING(false, false),
-        ROLLING(true, true),
+        ROLLING(false, true),
         GUARDING(true, false);
 
         private final boolean allowsFacing;
@@ -48,7 +46,6 @@ public class Entity {
     public GamePanel.Direction direction = GamePanel.Direction.DOWN;
 
     /* ATTACK VALUES */
-    private int attack = 1;
     protected int swingSpeed1;
     protected int swingSpeed2;
     protected int swingSpeed3;

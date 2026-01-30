@@ -185,9 +185,13 @@ public class Player extends Entity {
         // Update player behavior based on current action
         updateAction();
 
-        // Allow directional input if current action allows
+        // Read directional input if current action allows
         if (action.allowsFacing()) {
             handleMovementInput();
+        }
+        // Auto-move player if action denies input but allows movement
+        else if (action.allowsTranslation()) {
+            move();
         }
 
         manageValues();
@@ -335,7 +339,7 @@ public class Player extends Entity {
      */
     protected void move() {
 
-        if (!canMove) {
+        if (!canMove || collisionOn) {
             moving = false;
             return;
         }
