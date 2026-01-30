@@ -1,0 +1,877 @@
+package entity;
+
+import application.GamePanel;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
+import static application.GamePanel.Direction.*;
+
+public class Player extends Entity {
+
+    /* POSITIONING */
+    public int screenX, screenY;
+
+    /* GENERAL ATTRIBUTES */
+    private Action action = Action.IDLE;
+    private int spinCharge = 0;
+    private int charge = 0;
+
+    /* MOVEMENT ATTRIBUTES */
+    private boolean moving = false;
+    private boolean lockedOn;
+    private GamePanel.Direction lockonDirection;
+
+    /* ANIMATION HANDLERS */
+    private int coolDownCounter = 0;
+    private int attackNum = 1, attackCounter = 0;
+    private int spinNum = 0;
+    private int rollNum = 1, rollCounter = 0;
+    private int guardNum = 1, guardCounter = 0;
+
+    /* SPRITE IMAGES */
+    private BufferedImage
+            attackUp1, attackUp2, attackUp3, attackDown1, attackDown2, attackDown3,
+            attackLeft1, attackLeft2, attackLeft3, attackRight1, attackRight2, attackRight3,
+
+            spinUp1, spinUp2, spinDown1, spinDown2,
+            spinLeft1, spinLeft2, spinRight1, spinRight2,
+
+            rollUp1, rollUp2, rollUp3, rollUp4, rollDown1, rollDown2, rollDown3, rollDown4,
+            rollLeft1, rollLeft2, rollLeft3, rollLeft4, rollRight1, rollRight2, rollRight3, rollRight4,
+
+            guardUp1, guardUp2, guardDown1, guardDown2,
+            guardLeft1, guardLeft2, guardRight1, guardRight2;
+
+    /**
+     * CONSTRUCTOR
+     * @param gp GamePanel
+     */
+    public Player(GamePanel gp) {
+        super(gp);
+
+        // Player position locked to center of screen
+        screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
+        screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
+
+        // Hitbox
+        hitbox = new Rectangle(8, 12, 32, 34);
+        hitboxDefaultWidth = hitbox.width;
+        hitboxDefaultHeight = hitbox.height;
+
+        // Attack box
+        attackBox.width = 44;
+        attackBox.height = 42;
+
+        swingSpeed1 = 4;
+        swingSpeed2 = 7;
+        swingSpeed3 = 15;
+    }
+
+    /* GET IMAGES */
+    protected void getImages() {
+        up1 = setupImage("/player/boy_up_1");
+        up2 = setupImage("/player/boy_up_2");
+        down1 = setupImage("/player/boy_down_1");
+        down2 = setupImage("/player/boy_down_2");
+        left1 = setupImage("/player/boy_left_1");
+        left2 = setupImage("/player/boy_left_2");
+        right1 = setupImage("/player/boy_right_1");
+        right2 = setupImage("/player/boy_right_2");
+        getAllImages();
+    }
+    private void getAllImages() {
+        getAttackImages();
+        getSpinImages();
+        getRollImages();
+        getGuardImages();
+    }
+    private void getAttackImages() {
+        attackUp1 = setupImage("/player/boy_attack_kokiri_up_1", gp.tileSize * 2, gp.tileSize);
+        attackUp2 = setupImage("/player/boy_attack_kokiri_up_2", gp.tileSize * 2, gp.tileSize * 2);
+        attackUp3 = setupImage("/player/boy_attack_kokiri_up_3", gp.tileSize, gp.tileSize * 2);
+        attackDown1 = setupImage("/player/boy_attack_kokiri_down_1", gp.tileSize * 2, gp.tileSize);
+        attackDown2 = setupImage("/player/boy_attack_kokiri_down_2", gp.tileSize * 2, gp.tileSize * 2);
+        attackDown3 = setupImage("/player/boy_attack_kokiri_down_3", gp.tileSize, gp.tileSize * 2);
+        attackLeft1 = setupImage("/player/boy_attack_kokiri_left_1", gp.tileSize, gp.tileSize * 2);
+        attackLeft2 = setupImage("/player/boy_attack_kokiri_left_2", gp.tileSize * 2, gp.tileSize * 2);
+        attackLeft3 = setupImage("/player/boy_attack_kokiri_left_3", gp.tileSize * 2, gp.tileSize);
+        attackRight1 = setupImage("/player/boy_attack_kokiri_right_1", gp.tileSize, gp.tileSize * 2);
+        attackRight2 = setupImage("/player/boy_attack_kokiri_right_2", gp.tileSize * 2, gp.tileSize * 2);
+        attackRight3 = setupImage("/player/boy_attack_kokiri_right_3", gp.tileSize * 2, gp.tileSize);
+    }
+    private void getSpinImages() {
+        spinUp1 = setupImage("/player/boy_spin_kokiri_up_1", gp.tileSize * 2, gp.tileSize * 2);
+        spinUp2 = setupImage("/player/boy_spin_kokiri_up_2", gp.tileSize, gp.tileSize * 2);
+        spinDown1 = setupImage("/player/boy_spin_kokiri_down_1", gp.tileSize * 2, gp.tileSize * 2);
+        spinDown2 = setupImage("/player/boy_spin_kokiri_down_2", gp.tileSize, gp.tileSize * 2);
+        spinLeft1 = setupImage("/player/boy_spin_kokiri_left_1", gp.tileSize * 2, gp.tileSize * 2);
+        spinLeft2 = setupImage("/player/boy_spin_kokiri_left_2", gp.tileSize * 2, gp.tileSize);
+        spinRight1 = setupImage("/player/boy_spin_kokiri_right_1", gp.tileSize * 2, gp.tileSize * 2);
+        spinRight2 = setupImage("/player/boy_spin_kokiri_right_2", gp.tileSize * 2, gp.tileSize);
+    }
+    private void getRollImages() {
+        rollUp1 = setupImage("/player/boy_roll_up_1");
+        rollUp2 = setupImage("/player/boy_roll_up_2");
+        rollUp3 = setupImage("/player/boy_roll_up_3");
+        rollUp4 = setupImage("/player/boy_roll_up_4");
+        rollDown1 = setupImage("/player/boy_roll_down_1");
+        rollDown2 = setupImage("/player/boy_roll_down_2");
+        rollDown3 = setupImage("/player/boy_roll_down_3");
+        rollDown4 = setupImage("/player/boy_roll_down_4");
+        rollLeft1 = setupImage("/player/boy_roll_left_1");
+        rollLeft2 = setupImage("/player/boy_roll_left_2");
+        rollLeft3 = setupImage("/player/boy_roll_left_3");
+        rollLeft4 = setupImage("/player/boy_roll_left_4");
+        rollRight1 = setupImage("/player/boy_roll_right_1");
+        rollRight2 = setupImage("/player/boy_roll_right_2");
+        rollRight3 = setupImage("/player/boy_roll_right_3");
+        rollRight4 = setupImage("/player/boy_roll_right_4");
+    }
+    private void getGuardImages() {
+        guardUp1 = setupImage("/player/boy_guard_up_1");
+        guardUp2 = setupImage("/player/boy_guard_up_2");
+        guardDown1 = setupImage("/player/boy_guard_down_1");
+        guardDown2 = setupImage("/player/boy_guard_down_2");
+        guardLeft1 = setupImage("/player/boy_guard_left_1");
+        guardLeft2 = setupImage("/player/boy_guard_left_2");
+        guardRight1 = setupImage("/player/boy_guard_right_1");
+        guardRight2 = setupImage("/player/boy_guard_right_2");
+    }
+
+    /**
+     * SET DEFAULT VALUES
+     * Resets all attributes to base values
+     */
+    public void setDefaultValues() {
+        setDefaultAnimationValues();
+        setDefaultPosition();
+    }
+
+    /**
+     * SET DEFAULT ANIMATION VALUES
+     */
+    private void setDefaultAnimationValues() {
+        speed = 3;
+        defaultSpeed = speed;
+        animationSpeed = 10;
+    }
+
+    /**
+     * SET DEFAULT POSITON
+     */
+    private void setDefaultPosition() {
+        worldX = gp.tileSize * 23;
+        worldY = gp.tileSize * 21;
+
+        gp.currentMap = 0;
+        gp.currentArea = gp.outside;
+    }
+
+    /**
+     * UPDATE
+     * Updates player character based on user inputs
+     * Called by GamePanel every frame
+     */
+    public void update() {
+
+        checkCollision();
+
+        // Allow A press only when Idle
+        if (action == Action.IDLE) {
+            handleActionInput();
+        }
+
+        // Update player behavior based on current action
+        updateAction();
+
+        // Allow directional input if current action allows
+        if (action.allowsFacing()) {
+            handleMovementInput();
+        }
+
+        manageValues();
+    }
+
+    /**
+     * CHECK COLLISION
+     * Checks if player has collided with anything
+     * Called by update()
+     */
+    protected void checkCollision() {
+        collisionOn = false;
+
+        // Check tile collision
+        gp.cChecker.checkTile(this);
+    }
+
+    /**
+     * HANDLE ACTION INPUT
+     * Updates action based on button pressed
+     * Called by update() if player is IDLE
+     */
+    private void handleActionInput() {
+
+        // Action button
+        if (gp.keyH.aPressed) {
+            startAction();
+        }
+        // Swing sword
+        else if (gp.keyH.bPressed) {
+            action = Action.ATTACKING;
+        }
+        // Shield guard
+        else if (gp.keyH.rPressed) {
+            action = Action.GUARDING;
+        }
+    }
+
+    /**
+     * START ACTION
+     * Updates action based on current situation
+     * Called by handleActionInput() when A pressed
+     */
+    private void startAction() {
+
+        gp.keyH.aPressed = false;
+
+        switch (action) {
+            // Different action based on current status
+            case IDLE -> {
+                // Cooldown needed for rolling
+                if (moving && coolDownCounter == 0) {
+                    action = Action.ROLLING;
+                    lockonDirection = direction;
+                    coolDownCounter = 30;
+                }
+            }
+        }
+    }
+
+    /**
+     * UPDATE ACTION
+     * Calls the action method based on current player action
+     * Called by update()
+     */
+    private void updateAction() {
+        switch (action) {
+            case ATTACKING -> attacking();
+            case CHARGING -> charging();
+            case SPINNING -> spinning();
+            case ROLLING -> rolling();
+            case GUARDING -> guarding();
+        }
+    }
+
+    /**
+     * HANDLE MOVEMENT INPUT
+     * Calls directionPressed() to update direction when an arrow key is pressed
+     * Called by update() if current action allows
+     */
+    private void handleMovementInput() {
+        if (gp.keyH.upPressed || gp.keyH.downPressed || gp.keyH.leftPressed || gp.keyH.rightPressed) {
+            updateDirection();
+        }
+        else {
+            moving = false;
+        }
+    }
+
+    /**
+     * UPDATE DIRECTION
+     * Handles player movement logic
+     * Called by handleMovementInput() when an arrow key is pressed
+     */
+    private void updateDirection() {
+
+        if (action.allowsFacing()) {
+            updateFacing();
+        }
+
+        if (!action.allowsTranslation() || collisionOn) {
+            moving = false;
+            return;
+        }
+
+        move();
+        cycleSprites();
+    }
+
+    /**
+     * UPDATE FACING
+     * Sets new player direction
+     * Called by directionPressed() if current action allows
+     */
+    private void updateFacing() {
+
+        GamePanel.Direction nextDirection = direction;
+
+        boolean up = gp.keyH.upPressed;
+        boolean down = gp.keyH.downPressed;
+        boolean left = gp.keyH.leftPressed;
+        boolean right = gp.keyH.rightPressed;
+
+        if (up && left) nextDirection = UPLEFT;
+        else if (up && right) nextDirection = UPRIGHT;
+        else if (down && left) nextDirection = DOWNLEFT;
+        else if (down && right)  nextDirection = DOWNRIGHT;
+        else if (up) nextDirection = UP;
+        else if (down) nextDirection = DOWN;
+        else if (left) nextDirection = LEFT;
+        else if (right) nextDirection = RIGHT;
+
+        if (lockedOn) {
+            lockonDirection = nextDirection;
+        }
+        else {
+            direction = nextDirection;
+        }
+    }
+
+    /**
+     * MOVE
+     * Repositions the player's X, Y based on direction and speed
+     * Called by updateDirection() if o collision
+     */
+    protected void move() {
+
+        if (!canMove) {
+            moving = false;
+            return;
+        }
+
+        moving = true;
+        GamePanel.Direction newDirection = resolveMoveDirection();
+
+        switch (newDirection) {
+            case UP -> worldY -= speed;
+            case UPLEFT -> {
+                worldY -= (int) (speed - 0.5);
+                worldX -= (int) (speed - 0.5);
+            }
+            case UPRIGHT -> {
+                worldY -= (int) (speed - 0.5);
+                worldX += (int) (speed - 0.5);
+            }
+            case DOWN -> worldY += speed;
+            case DOWNLEFT -> {
+                worldY += (int) (speed - 0.5);
+                worldX -= (int) (speed - 0.5);
+            }
+            case DOWNRIGHT -> {
+                worldY += speed;
+                worldX += (int) (speed - 0.5);
+            }
+            case LEFT -> worldX -= speed;
+            case RIGHT-> worldX += speed;
+        }
+    }
+
+    /**
+     * RESOLVE MOVE DIRECTION
+     * @return updated player direction
+     * Decides if direction or lockonDirection should be used
+     * Called by move()
+     */
+    private GamePanel.Direction resolveMoveDirection() {
+        if (action == Action.ROLLING || lockedOn) {
+            return lockonDirection;
+        }
+
+        return direction;
+    }
+
+    /**
+     * CYCLE SPRITES
+     * Changes the animation counter for draw to render the correct sprite
+     */
+    protected void cycleSprites() {
+
+        spriteCounter++;
+        if (spriteCounter > animationSpeed) {
+
+            // CYCLE WALKING/SWIMMING SPRITES
+            if (spriteNum == 1) {
+                spriteNum = 2;
+            }
+            else if (spriteNum == 2) {
+                spriteNum = 1;
+            }
+
+            speed = defaultSpeed;
+            animationSpeed = 10;
+
+            spriteCounter = 0;
+        }
+    }
+
+    /**
+     * ATTACKING
+     * Handles logic for swinging sword
+     * Called by update() when attacking is true
+     */
+    private void attacking() {
+
+        // Increase spin charge if player holds B button
+        if (gp.keyH.bPressed) {
+            spinCharge++;
+        }
+        else {
+            spinCharge = 0;
+        }
+
+        attackCounter++;
+        if (swingSpeed1 >= attackCounter) {
+            attackNum = 1;
+        }
+        else if (swingSpeed2 >= attackCounter) {
+            attackNum = 2;
+        }
+        else if (swingSpeed3 >= attackCounter) {
+            attackNum = 3;
+
+            // Save X/Y
+            int currentWorldX = worldX;
+            int currentWorldY = worldY;
+
+            // Adjust X/Y
+            switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> {
+                    worldY -= attackBox.height + hitbox.y;
+                    hitbox.height = attackBox.height;
+                }
+                case DOWN, DOWNLEFT, DOWNRIGHT -> {
+                    worldY += attackBox.height - hitbox.y;
+                    hitbox.height = attackBox.height;
+                }
+                case LEFT -> {
+                    worldX -= attackBox.width;
+                    hitbox.width = attackBox.width;
+                }
+                case RIGHT -> {
+                    worldX += attackBox.width - hitbox.y;
+                    hitbox.width = attackBox.width;
+                }
+            }
+
+            // Restore hitbox
+            worldX = currentWorldX;
+            worldY = currentWorldY;
+            hitbox.width = hitboxDefaultWidth;
+            hitbox.height = hitboxDefaultHeight;
+        }
+        else {
+            action = Action.IDLE;
+
+            // Spin charge ready for spin attack
+            if (spinCharge > swingSpeed3 && gp.keyH.bPressed) {
+                action = Action.CHARGING;
+                lockedOn = true;
+                lockonDirection = direction;
+            }
+
+            attackCounter = 0;
+            spinCharge = 0;
+        }
+    }
+
+    /**
+     * CHARGE SPIN
+     * Charges spin attack while holding B
+     * Called by getAction() when action == CHARGING
+     */
+    private void charging() {
+
+        // Player holding B to charge
+        if (gp.keyH.bPressed) {
+            if (charge < 119) {
+                charge += 2;
+            }
+            speed = 2;
+        }
+        // Charge is ready, start spin and reset values
+        else if (charge >= 120) {
+            direction = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> LEFT;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> RIGHT;
+                case LEFT -> DOWN;
+                case RIGHT -> UP;
+            };
+
+            charge = 0;
+            lockedOn = false;
+            attackNum = 1;
+            speed = defaultSpeed;
+            action = Action.SPINNING;
+        }
+        // Player released B, charge not ready, reset to idle
+        else {
+            charge = 0;
+            attackNum = 1;
+            attackCounter = 0;
+            lockedOn = false;
+            action = Action.IDLE;
+        }
+    }
+
+    /**
+     * SPIN ATTACKING
+     * Handles sword spin attack logic
+     * Called by getAction() when action == SPINNING
+     */
+    private void spinning() {
+
+        attackCounter++;
+        if (attackCounter < 3) {
+            attackNum = 1;
+        }
+        else if (attackCounter < 6) {
+            attackNum = 2;
+
+            // TODO: Adjust world X/Y to detect if enemies are in range of spin attack
+            switch (direction) {
+                case UP, UPLEFT, UPRIGHT, DOWN, DOWNLEFT, DOWNRIGHT -> {
+                    hitbox.height = attackBox.height;
+                    hitbox.width *= 2;
+                }
+                case LEFT, RIGHT -> {
+                    hitbox.width = attackBox.width;
+                    hitbox.height *= 2;
+                }
+            }
+            // TODO: Detect if enemies hit by spin attack
+
+            // TODO: Reset world X/Y
+            hitbox.width = hitboxDefaultWidth;
+            hitbox.height = hitboxDefaultHeight;
+        }
+        else {
+            // Reset sprite counter to animate attack for all 4 directions
+            attackNum = 1;
+            attackCounter = 0;
+
+            // Full counter-clockwise rotation
+            if (spinNum < 3) {
+               direction = switch (direction) {
+                   case UP, UPLEFT, UPRIGHT -> LEFT;
+                   case DOWN, DOWNLEFT, DOWNRIGHT -> RIGHT;
+                   case LEFT -> DOWN;
+                   case RIGHT -> UP;
+               };
+            }
+
+            // Run 4 times for 4 directions, then stop spin
+            spinNum++;
+            if (spinNum == 4) {
+                spinNum = 0;
+                action = Action.IDLE;
+            }
+        }
+    }
+
+    /**
+     * ROLLING
+     * Handles logic for when the player rolls
+     * Called by getAction() when action = ROLLING
+     */
+    private void rolling() {
+
+        speed = 5;
+
+        rollCounter++;
+        if (5 >= rollCounter) {
+            rollNum = 1;
+        }
+        else if (10 > rollCounter) {
+            rollNum = 2;
+        }
+        else if (15 > rollCounter) {
+            rollNum = 3;
+        }
+        else if (20 > rollCounter) {
+            rollNum = 4;
+        }
+        else {
+            rollNum = 1;
+            rollCounter = 0;
+            action = Action.IDLE;
+            speed = defaultSpeed;
+        }
+    }
+
+    /**
+     * GUARDING
+     * Handles logic for when the player shield guards
+     * Called by getAction() when action = GUARDING
+     */
+    private void guarding() {
+        // Activate guard when R is held down
+        if (gp.keyH.rPressed) {
+            if (guardCounter < 15) {
+                guardCounter++;
+            }
+
+            if (guardCounter < 7) {
+                guardNum = 1;
+            } else {
+                guardNum = 2;
+            }
+        }
+        // Release guard when player releases R
+        else {
+            guardNum = 1;
+            guardCounter = 0;
+            action = Action.IDLE;
+        }
+    }
+
+    /**
+     * MANAGE VALUES
+     * Resets or reassigns player attributes
+     * Called by update() at the end
+     */
+    protected void manageValues() {
+
+        // Decrease cooldown if filled
+        if (coolDownCounter > 0) {
+            coolDownCounter--;
+        }
+    }
+
+    /**
+     * DRAW
+     * Draws the sprite data to the graphics
+     * Called by GamePanel every frame
+     * @param g2 GamePanel
+     */
+    public void draw(Graphics2D g2) {
+
+        offCenter();
+
+        // Match sprite to action
+        image = switch (action) {
+            case IDLE -> getIdleSprite();
+            case ATTACKING, CHARGING -> getAttackSprite();
+            case SPINNING ->  getSpinSprite();
+            case ROLLING -> getRollingSprite();
+            case GUARDING -> getGuardSprite();
+        };
+
+        g2.drawImage(image, tempScreenX, tempScreenY, null);
+
+        // Reset opacity
+        changeAlpha(g2, 1f);
+    }
+
+    /**
+     * OFF CENTER
+     * Adjusts X, Y if near edge
+     */
+    protected void offCenter() {
+        tempScreenX = screenX;
+        tempScreenY = screenY;
+
+        if (worldX < screenX) {
+            tempScreenX = worldX;
+        }
+        if (worldY < screenY) {
+            tempScreenY = worldY;
+        }
+
+        // From player to right-edge of screen
+        int rightOffset = gp.screenWidth - screenX;
+
+        //  From player to right-edge of world
+        if (rightOffset > gp.worldWidth - worldX) {
+            tempScreenX = gp.screenWidth - (gp.worldWidth - worldX);
+        }
+
+        // From player to bottom-edge of screen
+        int bottomOffSet = gp.screenHeight - screenY;
+
+        //  From player to bottom-edge of world
+        if (bottomOffSet > gp.worldHeight - worldY) {
+            tempScreenY = gp.screenHeight - (gp.worldHeight - worldY);
+        }
+    }
+
+    /** GET CURRENT SPRITE TO DRAW **/
+    private BufferedImage getIdleSprite() {
+        BufferedImage idleSprite = null;
+
+        if (spriteNum == 1) {
+            idleSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> up1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> down1;
+                case LEFT -> left1;
+                case RIGHT -> right1;
+            };
+        } else if (spriteNum == 2) {
+            idleSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> up2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> down2;
+                case LEFT -> left2;
+                case RIGHT -> right2;
+            };
+        }
+
+        return idleSprite;
+    }
+    private BufferedImage getAttackSprite() {
+
+        BufferedImage attackSprite = attackUp1;
+
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> {
+                if (attackNum > 1) {
+                    tempScreenY -= gp.tileSize;
+                }
+                attackSprite = switch (attackNum) {
+                    case 1 -> attackUp1;
+                    case 2 -> attackUp2;
+                    case 3 -> attackUp3;
+                    default -> attackSprite;
+                };
+            }
+            case DOWN, DOWNLEFT, DOWNRIGHT-> {
+                if (attackNum == 1 || attackNum == 2) {
+                    tempScreenX -= gp.tileSize;
+                }
+                attackSprite = switch (attackNum) {
+                    case 1 -> attackDown1;
+                    case 2 -> attackDown2;
+                    case 3 -> attackDown3;
+                    default -> attackSprite;
+                };
+            }
+            case LEFT -> {
+                if (attackNum == 1 || attackNum == 2) {
+                    tempScreenY -= gp.tileSize;
+                }
+                if (attackNum == 2 || attackNum == 3) {
+                    tempScreenX -= gp.tileSize;
+                }
+                attackSprite = switch (attackNum) {
+                    case 1 -> attackLeft1;
+                    case 2 -> attackLeft2;
+                    case 3 -> attackLeft3;
+                    default -> attackSprite;
+                };
+            }
+            case RIGHT -> {
+                if (attackNum == 1 || attackNum == 2) {
+                    tempScreenY -= gp.tileSize;
+                }
+                attackSprite = switch (attackNum) {
+                    case 1 -> attackRight1;
+                    case 2 -> attackRight2;
+                    case 3 -> attackRight3;
+                    default -> attackSprite;
+                };
+            }
+        }
+
+        return attackSprite;
+    }
+    private BufferedImage getSpinSprite() {
+        BufferedImage spinSprite = spinUp1;
+
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> {
+                tempScreenY -= gp.tileSize;
+                spinSprite = switch (attackNum) {
+                    case 1 -> spinUp1;
+                    case 2 -> spinUp2;
+                    default -> spinSprite;
+                };
+            }
+            case DOWN, DOWNLEFT, DOWNRIGHT-> {
+                if (attackNum == 1) {
+                    tempScreenX -= gp.tileSize;
+                }
+                spinSprite = switch (attackNum) {
+                    case 1 -> spinDown1;
+                    case 2 -> spinDown2;
+                    default -> spinSprite;
+                };
+            }
+            case LEFT -> {
+                 tempScreenX -= gp.tileSize;
+                if (attackNum == 1) {
+                    tempScreenY -= gp.tileSize;
+                }
+                spinSprite = switch (attackNum) {
+                    case 1 -> spinLeft1;
+                    case 2 -> spinLeft2;
+                    default -> spinSprite;
+                };
+            }
+            case RIGHT -> {
+                spinSprite = switch (attackNum) {
+                    case 1 -> spinRight1;
+                    case 2 -> spinRight2;
+                    default -> spinSprite;
+                };
+            }
+        }
+
+        return spinSprite;
+    }
+    private BufferedImage getRollingSprite() {
+        BufferedImage rollingSprite = rollUp1;
+
+        rollingSprite = switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> switch (rollNum) {
+                case 1 -> rollUp1;
+                case 2 -> rollUp2;
+                case 3 -> rollUp3;
+                case 4 -> rollUp4;
+                default -> rollingSprite;
+            };
+            case DOWN, DOWNLEFT, DOWNRIGHT -> switch (rollNum) {
+                case 1 -> rollDown1;
+                case 2 -> rollDown2;
+                case 3 -> rollDown3;
+                case 4 -> rollDown4;
+                default -> rollingSprite;
+            };
+            case LEFT -> switch (rollNum) {
+                case 1 -> rollLeft1;
+                case 2 -> rollLeft2;
+                case 3 -> rollLeft3;
+                case 4 -> rollLeft4;
+                default -> rollingSprite;
+            };
+            case RIGHT -> switch (rollNum) {
+                case 1 -> rollRight1;
+                case 2 -> rollRight2;
+                case 3 -> rollRight3;
+                case 4 -> rollRight4;
+                default -> rollingSprite;
+            };
+        };
+
+        return rollingSprite;
+    }
+    private BufferedImage getGuardSprite() {
+        BufferedImage guardSprite;
+
+        if (guardNum == 1) {
+            guardSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> guardUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> guardDown1;
+                case LEFT -> guardLeft1;
+                case RIGHT -> guardRight1;
+            };
+        } else {
+            guardSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> guardUp2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> guardDown2;
+                case LEFT -> guardLeft2;
+                case RIGHT -> guardRight2;
+            };
+        }
+
+        return guardSprite;
+    }
+}
