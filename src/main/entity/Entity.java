@@ -8,6 +8,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 
+import static application.GamePanel.Direction.*;
+
 public class Entity {
 
     protected enum Action {
@@ -39,11 +41,19 @@ public class Entity {
 
     /* GENERAL ATTRIBUTES */
     public int worldX, worldY;
+    protected int worldXStart, worldYStart;
     protected int tempScreenX, tempScreenY;
+    protected String name;
+
+    /* MOVEMENT VALUES */
+    public GamePanel.Direction direction = DOWN;
     public int speed = 1;
     protected int defaultSpeed;
+    protected boolean moving = false;
+
+    /* ANIMATION VALUES */
+    private int actionLockCounter = 0;
     protected int animationSpeed;
-    public GamePanel.Direction direction = GamePanel.Direction.DOWN;
 
     /* ATTACK VALUES */
     protected int swingSpeed1;
@@ -54,6 +64,7 @@ public class Entity {
     public boolean collisionOn = false;
     protected boolean canMove = true;
     public Rectangle hitbox = new Rectangle(0, 0, 48, 48);
+    protected int hitboxDefaultX, hitboxDefaultY;
     protected int hitboxDefaultWidth = hitbox.width;
     protected int hitboxDefaultHeight = hitbox.height;
     protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
@@ -127,7 +138,91 @@ public class Entity {
      * Called every frame by GamePanel
      */
     public void update() {
+        setAction();
+        updateDirection();
         manageValues();
+    }
+
+    protected void setAction() {}
+
+    protected void updateDirection() {
+        move(direction);
+        cycleSprites();
+    }
+
+    protected void move(GamePanel.Direction direction) {
+
+        if (!canMove || collisionOn) {
+            moving = false;
+            return;
+        }
+
+        moving = true;
+
+        switch (direction) {
+            case UP -> worldY -= speed;
+            case UPLEFT -> {
+                worldY -= (int) (speed - 0.5);
+                worldX -= (int) (speed - 0.5);
+            }
+            case UPRIGHT -> {
+                worldY -= (int) (speed - 0.5);
+                worldX += (int) (speed - 0.5);
+            }
+            case DOWN -> worldY += speed;
+            case DOWNLEFT -> {
+                worldY += (int) (speed - 0.5);
+                worldX -= (int) (speed - 0.5);
+            }
+            case DOWNRIGHT -> {
+                worldY += speed;
+                worldX += (int) (speed - 0.5);
+            }
+            case LEFT -> worldX -= speed;
+            case RIGHT-> worldX += speed;
+        }
+    }
+
+    /**
+     * CYCLE SPRITES
+     * Changes the animation counter for draw to render the correct sprite
+     */
+    protected void cycleSprites() {
+        spriteCounter++;
+        if (spriteCounter > animationSpeed && animationSpeed != 0) {
+
+            if (spriteNum == 1) {
+                spriteNum = 2;
+            }
+            else if (spriteNum == 2) {
+                spriteNum = 1;
+            }
+
+            spriteCounter = 0;
+        }
+    }
+
+    protected void setDirection(int rate) {
+
+        actionLockCounter++;
+        if (actionLockCounter >= rate) {
+
+            int dir = 1 + (int) (Math.random() * 4);
+            if (dir == 1) {
+                direction = UP;
+            }
+            else if (dir == 2) {
+                direction = DOWN;
+            }
+            else if (dir == 3) {
+                direction = LEFT;
+            }
+            else {
+                direction = RIGHT;
+            }
+
+            actionLockCounter = 0;
+        }
     }
 
     public GamePanel.Direction getMoveDirection() {
@@ -168,6 +263,8 @@ public class Entity {
                 case RIGHT -> right2;
             };
         }
+
+        offCenter();
 
         g2.drawImage(image, tempScreenX, tempScreenY, null);
 

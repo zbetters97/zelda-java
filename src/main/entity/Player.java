@@ -1,6 +1,7 @@
 package entity;
 
 import application.GamePanel;
+import application.UtilityTool;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -18,7 +19,6 @@ public class Player extends Entity {
     private int charge = 0;
 
     /* MOVEMENT ATTRIBUTES */
-    private boolean moving = false;
     private boolean lockedOn;
     private GamePanel.Direction lockonDirection;
 
@@ -300,7 +300,7 @@ public class Player extends Entity {
      * Handles player movement logic
      * Called by handleMovementInput() when an arrow key is pressed
      */
-    private void updateDirection() {
+    protected void updateDirection() {
 
         if (action.allowsFacing()) {
             updateFacing();
@@ -352,37 +352,8 @@ public class Player extends Entity {
      * Called by updateDirection() if o collision
      */
     protected void move() {
-
-        if (!canMove || collisionOn) {
-            moving = false;
-            return;
-        }
-
-        moving = true;
         GamePanel.Direction newDirection = getMoveDirection();
-
-        switch (newDirection) {
-            case UP -> worldY -= speed;
-            case UPLEFT -> {
-                worldY -= (int) (speed - 0.5);
-                worldX -= (int) (speed - 0.5);
-            }
-            case UPRIGHT -> {
-                worldY -= (int) (speed - 0.5);
-                worldX += (int) (speed - 0.5);
-            }
-            case DOWN -> worldY += speed;
-            case DOWNLEFT -> {
-                worldY += (int) (speed - 0.5);
-                worldX -= (int) (speed - 0.5);
-            }
-            case DOWNRIGHT -> {
-                worldY += speed;
-                worldX += (int) (speed - 0.5);
-            }
-            case LEFT -> worldX -= speed;
-            case RIGHT-> worldX += speed;
-        }
+        super.move(newDirection);
     }
 
     /**
@@ -397,31 +368,6 @@ public class Player extends Entity {
         }
 
         return direction;
-    }
-
-    /**
-     * CYCLE SPRITES
-     * Changes the animation counter for draw to render the correct sprite
-     * Called by updateDirection()
-     */
-    protected void cycleSprites() {
-
-        spriteCounter++;
-        if (spriteCounter > animationSpeed) {
-
-            // Cycle walking sprites
-            if (spriteNum == 1) {
-                spriteNum = 2;
-            }
-            else if (spriteNum == 2) {
-                spriteNum = 1;
-            }
-
-            speed = defaultSpeed;
-            animationSpeed = 10;
-
-            spriteCounter = 0;
-        }
     }
 
     /**

@@ -67,11 +67,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     /* HANDLERS */
     public TileManager tileM = new TileManager(this);
+    public AssetSetter aSetter = new AssetSetter(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
 
+
     /* ENTITIES */
-    public Player player = new Player(this);
     private final ArrayList<Entity> entityList = new ArrayList<>();
+    public final Player player = new Player(this);
+    final Entity[][] npc = new Entity[maxMap][10];
 
     /**
      * CONSTRUCTOR
@@ -100,6 +103,7 @@ public class GamePanel extends JPanel implements Runnable {
         g2 = (Graphics2D) tempScreen.getGraphics();
 
         tileM.loadMap();
+        aSetter.setup();
 
         player.setDefaultValues();
 
@@ -174,6 +178,15 @@ public class GamePanel extends JPanel implements Runnable {
      */
     private void update() {
         player.update();
+        updateNPCs();
+    }
+
+    private void updateNPCs() {
+        for (int i = 0; i < npc[0].length; i++) {
+            if (npc[currentMap][i] != null) {
+                npc[currentMap][i].update();
+            }
+        }
     }
 
     /**
@@ -186,6 +199,12 @@ public class GamePanel extends JPanel implements Runnable {
 
         // DRAW ENTITIES
         entityList.add(player);
+
+        for (Entity n : npc[currentMap]) {
+            if (n != null) {
+                entityList.add(n);
+            }
+        }
 
         for (Entity e : entityList) {
             e.draw(g2);
