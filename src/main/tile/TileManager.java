@@ -23,7 +23,6 @@ public class TileManager {
     /* TILE NUMBERS */
     private final int oceanTile1 = 19;
     private final int oceanTile2 = 39;
-    public final int spikeTile = 77;
 
     /* WATER ANIMATION COUNTER */
     private int waterNum = 1;

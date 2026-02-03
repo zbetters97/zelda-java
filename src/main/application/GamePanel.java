@@ -29,7 +29,6 @@ public class GamePanel extends JPanel implements Runnable {
 
     /* CONTROLS / SOUND / UI */
     public KeyHandler keyH = new KeyHandler();
-    public SoundManager se = new SoundManager();
 
     /* SCREEN SETTINGS */
     private final int originalTileSize = 16; // 16x16 tile
@@ -140,27 +139,28 @@ public class GamePanel extends JPanel implements Runnable {
      */
     @Override
     public void run() {
+
         long currentTime;
         long lastTime = System.nanoTime();
         double drawInterval = 1000000000.0 / 60.0; // 1/60th of a second
         double delta = 0;
 
-        // UPDATE AND REPAINT gameThread
+        // Update and repaint gameThread
         while (gameThread != null) {
 
             currentTime = System.nanoTime();
-            delta += (currentTime - lastTime) / drawInterval; // time passed (1/60th second)
+            delta += (currentTime - lastTime) / drawInterval; // Time passed (1/60th second)
             lastTime = currentTime;
 
             if (delta >= 1) {
 
-                // UPDATE GAME INFORMATION
+                // Update game information
                 update();
 
-                // DRAW TEMP SCREEN WITH NEW INFORMATION
+                // Draw temp screen with new information
                 drawToTempScreen();
 
-                // SEND TEMP SCREEN TO MONITOR
+                // Send temp screen to monitors
                 drawToScreen();
 
                 delta = 0;
@@ -190,6 +190,8 @@ public class GamePanel extends JPanel implements Runnable {
         for (Entity e : entityList) {
             e.draw(g2);
         }
+
+        entityList.clear();
     }
 
     /**

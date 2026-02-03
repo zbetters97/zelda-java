@@ -669,6 +669,8 @@ public class Player extends Entity {
         if (coolDownCounter > 0) {
             coolDownCounter--;
         }
+
+
     }
 
     /**

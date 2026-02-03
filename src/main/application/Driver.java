@@ -21,8 +21,8 @@ public class Driver {
         window.setTitle("Legend of Zelda");
         new Driver().setGameIcon();
 
-       GamePanel gamePanel = new GamePanel();
-       window.add(gamePanel);
+        GamePanel gamePanel = new GamePanel();
+        window.add(gamePanel);
 
         // LOAD SETTINGS
         if (gamePanel.fullScreenOn) {
