@@ -123,4 +123,96 @@ public record CollisionChecker(GamePanel gp) {
             entity.collisionOn = true;
         }
     }
+
+    /**
+     * CHECK ENTITY
+     * @param entity Entity to check collision for
+     * @param targets List of entities to check collision on
+     */
+    public void checkEntity(Entity entity, Entity[][] targets) {
+
+        for (int i = 0; i < targets[0].length; i++) {
+            if (targets[gp.currentMap][i] != null) {
+
+                entity.hitbox.x = entity.worldX + entity.hitbox.x;
+                entity.hitbox.y = entity.worldY + entity.hitbox.y;
+                
+                targets[gp.currentMap][i].hitbox.x = targets[gp.currentMap][i].worldX + targets[gp.currentMap][i].hitbox.x;
+                targets[gp.currentMap][i].hitbox.y = targets[gp.currentMap][i].worldY + targets[gp.currentMap][i].hitbox.y;
+
+                switch (entity.direction) {
+                    case UP -> entity.hitbox.y -= entity.speed;
+                    case UPLEFT -> {
+                        entity.hitbox.y -= entity.speed;
+                        entity.hitbox.x -= entity.speed;
+                    }
+                    case UPRIGHT -> {
+                        entity.hitbox.y -= entity.speed;
+                        entity.hitbox.x += entity.speed;
+                    }
+                    case DOWN -> entity.hitbox.y += entity.speed;
+                    case DOWNLEFT -> {
+                        entity.hitbox.y += entity.speed;
+                        entity.hitbox.x -= entity.speed;
+                    }
+                    case DOWNRIGHT -> {
+                        entity.hitbox.y += entity.speed;
+                        entity.hitbox.x += entity.speed;
+                    }
+                    case LEFT -> entity.hitbox.x -= entity.speed;
+                    case RIGHT -> entity.hitbox.x += entity.speed;
+                }
+
+                if (entity.hitbox.intersects(targets[gp.currentMap][i].hitbox)) {
+                    if (targets[gp.currentMap][i] != entity) {
+                        if (targets[gp.currentMap][i].collisionOn) {
+                            entity.collisionOn = true;
+                        }                        
+                    }
+                }
+
+                // Reset entity solid area
+                entity.hitbox.x = entity.hitboxDefaultX;
+                entity.hitbox.y = entity.hitboxDefaultY;
+
+                // Reset object solid area
+                targets[gp.currentMap][i].hitbox.x = targets[gp.currentMap][i].hitboxDefaultX;
+                targets[gp.currentMap][i].hitbox.y = targets[gp.currentMap][i].hitboxDefaultY;
+            }
+        }
+    }
+
+    /**
+     * CONTACT PLAYER
+     * Checks if the given entity will collide with the player entity
+     * @param entity Entity to check collision for
+     */
+    public void checkPlayer(Entity entity) {
+
+        entity.hitbox.x = entity.worldX + entity.hitbox.x;
+        entity.hitbox.y = entity.worldY + entity.hitbox.y;
+
+        gp.player.hitbox.x = gp.player.worldX + gp.player.hitbox.x;
+        gp.player.hitbox.y = gp.player.worldY + gp.player.hitbox.y;
+
+        switch (entity.direction) {
+            case UP -> entity.hitbox.y -= entity.speed;
+            case DOWN -> entity.hitbox.y += entity.speed;
+            case LEFT -> entity.hitbox.x -= entity.speed;
+            case RIGHT -> entity.hitbox.x += entity.speed;
+            default -> entity.collisionOn = true;
+        }
+
+        if (entity.hitbox.intersects(gp.player.hitbox)) {
+            entity.collisionOn = true;
+        }
+
+        // Reset entity solid area
+        entity.hitbox.x = entity.hitboxDefaultX;
+        entity.hitbox.y = entity.hitboxDefaultY;
+
+        // Reset object solid area
+        gp.player.hitbox.x = gp.player.hitboxDefaultX;
+        gp.player.hitbox.y = gp.player.hitboxDefaultY;
+    }
 }

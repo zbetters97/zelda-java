@@ -64,7 +64,8 @@ public class Entity {
     public boolean collisionOn = false;
     protected boolean canMove = true;
     public Rectangle hitbox = new Rectangle(0, 0, 48, 48);
-    protected int hitboxDefaultX, hitboxDefaultY;
+    public int hitboxDefaultX;
+    public int hitboxDefaultY;
     protected int hitboxDefaultWidth = hitbox.width;
     protected int hitboxDefaultHeight = hitbox.height;
     protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
@@ -146,8 +147,20 @@ public class Entity {
     protected void setAction() {}
 
     protected void updateDirection() {
+        checkCollision();
         move(direction);
-        cycleSprites();
+
+        if (moving) {
+            cycleSprites();
+        }
+    }
+
+    protected void checkCollision() {
+
+        collisionOn = false;
+        gp.cChecker.checkTile(this);
+        gp.cChecker.checkPlayer(this);
+
     }
 
     protected void move(GamePanel.Direction direction) {

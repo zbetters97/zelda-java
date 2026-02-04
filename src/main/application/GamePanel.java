@@ -59,7 +59,6 @@ public class GamePanel extends JPanel implements Runnable {
     /* GAME STATES */
     public int gameState;
     public final int titleState = 0;
-    public final int musicState = 6;
 
     /* AREA STATES */
     public int currentArea;
@@ -74,7 +73,7 @@ public class GamePanel extends JPanel implements Runnable {
     /* ENTITIES */
     private final ArrayList<Entity> entityList = new ArrayList<>();
     public final Player player = new Player(this);
-    final Entity[][] npc = new Entity[maxMap][10];
+    public final Entity[][] npc = new Entity[maxMap][10];
 
     /**
      * CONSTRUCTOR
