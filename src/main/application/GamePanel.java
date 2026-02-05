@@ -29,6 +29,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     /* CONTROLS / SOUND / UI */
     public KeyHandler keyH = new KeyHandler();
+    public UI ui = new UI(this);
 
     /* SCREEN SETTINGS */
     private final int originalTileSize = 16; // 16x16 tile
@@ -208,6 +209,8 @@ public class GamePanel extends JPanel implements Runnable {
         for (Entity e : entityList) {
             e.draw(g2);
         }
+
+        ui.draw(g2);
 
         entityList.clear();
     }

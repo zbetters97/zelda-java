@@ -89,6 +89,11 @@ public class Entity {
      * GET IMAGE
      */
     protected void getImages() { }
+
+    /**
+     * SET ACTION
+     */
+    protected void setAction() { }
     /* END CHILD ONLY */
 
     /**
@@ -144,8 +149,10 @@ public class Entity {
         manageValues();
     }
 
-    protected void setAction() {}
-
+    /**
+     * UPDATE DIRECTION
+     * Handles logic involving moving the entity
+     */
     protected void updateDirection() {
         checkCollision();
         move(direction);
@@ -155,14 +162,23 @@ public class Entity {
         }
     }
 
+    /**
+     * CHECK COLLISION
+     * Checks if the entity collides with something
+     */
     protected void checkCollision() {
 
         collisionOn = false;
+
         gp.cChecker.checkTile(this);
         gp.cChecker.checkPlayer(this);
-
     }
 
+    /**
+     * MOVE
+     * Repositions the entity's X, Y based on direction and speed
+     * Called by updateDirection() if o collision
+     */
     protected void move(GamePanel.Direction direction) {
 
         if (!canMove || collisionOn) {
@@ -215,6 +231,11 @@ public class Entity {
         }
     }
 
+    /**
+     * SET DIRECTION
+     * Randomly re-assigns the direction the Entity is facing
+     * @param rate Integer frequency of updates (60 = 1 sec)
+     */
     protected void setDirection(int rate) {
 
         actionLockCounter++;
@@ -238,6 +259,11 @@ public class Entity {
         }
     }
 
+    /**
+     * GET MOVE DIRECTION
+     * Called by CollisionDetector
+     * @return Current direction of the entity
+     */
     public GamePanel.Direction getMoveDirection() {
         return direction;
     }
@@ -258,7 +284,7 @@ public class Entity {
      */
     public void draw(Graphics2D g2) {
 
-        BufferedImage image = null;
+        offCenter();
 
         // Match image to sprite direction
         if (spriteNum == 1) {
@@ -277,9 +303,10 @@ public class Entity {
             };
         }
 
-        offCenter();
-
         g2.drawImage(image, tempScreenX, tempScreenY, null);
+
+        // Draw hitbox (debug)
+        g2.drawRect(tempScreenX + hitbox.x, tempScreenY + hitbox.y, hitbox.width, hitbox.height);
 
         // Reset opacity
         changeAlpha(g2, 1f);
@@ -324,6 +351,7 @@ public class Entity {
     private int getScreenX() {
         return worldX - gp.player.worldX + gp.player.screenX;
     }
+
     /**
      * GET SCREEN Y
      * @return Screen Y relative to player

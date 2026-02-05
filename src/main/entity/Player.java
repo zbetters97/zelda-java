@@ -53,12 +53,14 @@ public class Player extends Entity {
 
         // Hitbox
         hitbox = new Rectangle(8, 12, 32, 34);
+        hitboxDefaultX = hitbox.x;
+        hitboxDefaultY = hitbox.y;
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
 
         // Attack box
-        attackBox.width = 44;
-        attackBox.height = 42;
+        attackBox.width = 32;
+        attackBox.height = 32;
 
         swingSpeed1 = 4;
         swingSpeed2 = 7;
@@ -304,18 +306,17 @@ public class Player extends Entity {
      * Called by handleMovementInput() when an arrow key is pressed
      */
     protected void updateDirection() {
-
         if (action.allowsFacing()) {
             updateFacing();
         }
 
-        if (!action.allowsTranslation() || collisionOn) {
-            moving = false;
-            return;
-        }
+       if (!action.allowsTranslation()) {
+           moving = false;
+           return;
+       }
 
-        move();
-        cycleSprites();
+       move();
+       cycleSprites();
     }
 
     /**
@@ -352,7 +353,7 @@ public class Player extends Entity {
     /**
      * MOVE
      * Repositions the player's X, Y based on direction and speed
-     * Called by updateDirection() if o collision
+     * Called by updateDirection() if no collision
      */
     protected void move() {
         GamePanel.Direction newDirection = getMoveDirection();
