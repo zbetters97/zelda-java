@@ -1,7 +1,6 @@
 package entity;
 
 import application.GamePanel;
-import application.UtilityTool;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,7 +15,7 @@ public class Player extends Entity {
     /* GENERAL ATTRIBUTES */
     private Action action = Action.IDLE;
     private int spinCharge = 0;
-    private int charge = 0;
+    public int charge = 0;
 
     /* MOVEMENT ATTRIBUTES */
     private boolean lockedOn;
@@ -682,7 +681,7 @@ public class Player extends Entity {
 
     /** GET CURRENT SPRITE TO DRAW **/
     private BufferedImage getIdleSprite() {
-        BufferedImage idleSprite = null;
+        BufferedImage idleSprite;
 
         if (spriteNum == 1) {
             idleSprite = switch (direction) {
@@ -819,13 +818,12 @@ public class Player extends Entity {
                     default -> spinSprite;
                 };
             }
-            case RIGHT -> {
-                spinSprite = switch (attackNum) {
-                    case 1 -> spinRight1;
-                    case 2 -> spinRight2;
-                    default -> spinSprite;
-                };
-            }
+            case RIGHT ->
+                    spinSprite = switch (attackNum) {
+                        case 1 -> spinRight1;
+                        case 2 -> spinRight2;
+                        default -> spinSprite;
+                     };
         }
 
         return spinSprite;

@@ -348,7 +348,7 @@ public class Entity {
      * GET SCREEN X
      * @return Screen X relative to player
      */
-    private int getScreenX() {
+    public int getScreenX() {
         return worldX - gp.player.worldX + gp.player.screenX;
     }
 
@@ -356,7 +356,7 @@ public class Entity {
      * GET SCREEN Y
      * @return Screen Y relative to player
      */
-    private int getScreenY() {
+    public int getScreenY() {
         return worldY - gp.player.worldY + gp.player.screenY;
     }
 
