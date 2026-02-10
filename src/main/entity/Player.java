@@ -46,6 +46,8 @@ public class Player extends Entity {
     public Player(GamePanel gp) {
         super(gp);
 
+        name = "Link";
+
         // Player position locked to center of screen
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
         screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
@@ -176,8 +178,6 @@ public class Player extends Entity {
      * Called by GamePanel every frame
      */
     public void update() {
-
-        checkCollision();
 
         // Allow A press only when Idle
         if (action == Action.IDLE) {
@@ -358,6 +358,8 @@ public class Player extends Entity {
      * Called by updateDirection() if no collision
      */
     protected void move() {
+        checkCollision();
+
         GamePanel.Direction newDirection = getMoveDirection();
         super.move(newDirection);
     }

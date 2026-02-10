@@ -94,7 +94,7 @@ public record CollisionChecker(GamePanel gp) {
                 tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow];
             }
             default -> {
-                entity.collisionOn = false;
+                entity.collisionOn = true;
                 return;
             }
         }
@@ -112,13 +112,15 @@ public record CollisionChecker(GamePanel gp) {
     public void checkEntity(Entity entity, Entity[][] targets) {
 
         for (int i = 0; i < targets[0].length; i++) {
-            if (targets[gp.currentMap][i] != null) {
+            if (targets[gp.currentMap][i] != null && targets[gp.currentMap][i] != entity) {
+
+                Entity target = targets[gp.currentMap][i];
 
                 entity.hitbox.x = entity.worldX + entity.hitbox.x;
                 entity.hitbox.y = entity.worldY + entity.hitbox.y;
                 
-                targets[gp.currentMap][i].hitbox.x = targets[gp.currentMap][i].worldX + targets[gp.currentMap][i].hitbox.x;
-                targets[gp.currentMap][i].hitbox.y = targets[gp.currentMap][i].worldY + targets[gp.currentMap][i].hitbox.y;
+                target.hitbox.x = target.worldX + target.hitbox.x;
+                target.hitbox.y = target.worldY + target.hitbox.y;
 
                 switch (entity.direction) {
                     case UP -> entity.hitbox.y -= entity.speed;
@@ -143,12 +145,8 @@ public record CollisionChecker(GamePanel gp) {
                     case RIGHT -> entity.hitbox.x += entity.speed;
                 }
 
-                if (entity.hitbox.intersects(targets[gp.currentMap][i].hitbox)) {
-                    if (targets[gp.currentMap][i] != entity) {
-                        if (targets[gp.currentMap][i].collisionOn) {
-                            entity.collisionOn = true;
-                        }                        
-                    }
+                if (entity.hitbox.intersects(target.hitbox)) {
+                    entity.collisionOn = true;
                 }
 
                 // Reset entity solid area
@@ -156,8 +154,8 @@ public record CollisionChecker(GamePanel gp) {
                 entity.hitbox.y = entity.hitboxDefaultY;
 
                 // Reset object solid area
-                targets[gp.currentMap][i].hitbox.x = targets[gp.currentMap][i].hitboxDefaultX;
-                targets[gp.currentMap][i].hitbox.y = targets[gp.currentMap][i].hitboxDefaultY;
+                target.hitbox.x = target.hitboxDefaultX;
+                target.hitbox.y = target.hitboxDefaultY;
             }
         }
     }
@@ -180,7 +178,10 @@ public record CollisionChecker(GamePanel gp) {
             case DOWN -> entity.hitbox.y += entity.speed;
             case LEFT -> entity.hitbox.x -= entity.speed;
             case RIGHT -> entity.hitbox.x += entity.speed;
-            default -> entity.collisionOn = true;
+            default -> {
+                entity.collisionOn = true;
+                return;
+            }
         }
 
         if (entity.hitbox.intersects(gp.player.hitbox)) {
@@ -191,7 +192,7 @@ public record CollisionChecker(GamePanel gp) {
         entity.hitbox.x = entity.hitboxDefaultX;
         entity.hitbox.y = entity.hitboxDefaultY;
 
-        // Reset object solid area
+        // Reset player solid area
         gp.player.hitbox.x = gp.player.hitboxDefaultX;
         gp.player.hitbox.y = gp.player.hitboxDefaultY;
     }

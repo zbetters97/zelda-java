@@ -43,7 +43,7 @@ public class Entity {
     public int worldX, worldY;
     protected int worldXStart, worldYStart;
     protected int tempScreenX, tempScreenY;
-    protected String name;
+    public String name;
 
     /* MOVEMENT VALUES */
     public GamePanel.Direction direction = DOWN;
@@ -61,7 +61,7 @@ public class Entity {
     protected int swingSpeed3;
 
     /* COLLISION VALUES */
-    public boolean collisionOn = false;
+    public boolean collisionOn = true;
     protected boolean canMove = true;
     public Rectangle hitbox = new Rectangle(0, 0, 48, 48);
     public int hitboxDefaultX;
@@ -167,7 +167,6 @@ public class Entity {
      * Checks if the entity collides with something
      */
     protected void checkCollision() {
-
         collisionOn = false;
 
         gp.cChecker.checkTile(this);
@@ -180,7 +179,6 @@ public class Entity {
      * Called by updateDirection() if o collision
      */
     protected void move(GamePanel.Direction direction) {
-
         if (!canMove || collisionOn) {
             moving = false;
             return;
