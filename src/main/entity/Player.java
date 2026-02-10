@@ -212,6 +212,9 @@ public class Player extends Entity {
 
         // Check NPC collision
         gp.cChecker.checkEntity(this, gp.npc);
+
+        // Check enemy collision
+        gp.cChecker.checkEntity(this, gp.enemy);
     }
 
     /**

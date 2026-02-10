@@ -75,6 +75,7 @@ public class GamePanel extends JPanel implements Runnable {
     private final ArrayList<Entity> entityList = new ArrayList<>();
     public final Player player = new Player(this);
     public final Entity[][] npc = new Entity[maxMap][10];
+    public final Entity[][] enemy = new Entity[maxMap][10];
 
     /**
      * CONSTRUCTOR
@@ -179,12 +180,21 @@ public class GamePanel extends JPanel implements Runnable {
     private void update() {
         player.update();
         updateNPCs();
+        updateEnemies();
     }
 
     private void updateNPCs() {
         for (int i = 0; i < npc[0].length; i++) {
             if (npc[currentMap][i] != null) {
                 npc[currentMap][i].update();
+            }
+        }
+    }
+
+    private void updateEnemies() {
+        for (int i = 0; i < enemy[0].length; i++) {
+            if (enemy[currentMap][i] != null) {
+                enemy[currentMap][i].update();
             }
         }
     }
@@ -200,7 +210,15 @@ public class GamePanel extends JPanel implements Runnable {
         // DRAW ENTITIES
         entityList.add(player);
 
+        // NPCs
         for (Entity n : npc[currentMap]) {
+            if (n != null) {
+                entityList.add(n);
+            }
+        }
+
+        // ENEMIES
+        for (Entity n : enemy[currentMap]) {
             if (n != null) {
                 entityList.add(n);
             }

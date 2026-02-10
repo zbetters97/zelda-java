@@ -1,15 +1,13 @@
-package entity.npc;
+package entity.enemy;
 
 import application.GamePanel;
 import entity.Entity;
 
 import java.awt.*;
 
-import static application.GamePanel.Direction.DOWN;
+public class EMY_Keese extends Entity {
 
-public class NPC_OldMan extends Entity {
-
-    public static final String npcName = "Old Man";
+    public static final String emyName = "Keese";
 
     /**
      * CONSTRUCTOR
@@ -17,7 +15,7 @@ public class NPC_OldMan extends Entity {
      * @param worldX Starting coordinate
      * @param worldY Starting coordinate
      */
-    public NPC_OldMan(GamePanel gp, int worldX, int worldY) {
+    public EMY_Keese(GamePanel gp, int worldX, int worldY) {
         super(gp);
 
         // Coordinates
@@ -27,13 +25,13 @@ public class NPC_OldMan extends Entity {
         worldYStart = this.worldY;
 
         // General attributes
-        name = npcName;
-        speed = 1;
+        name = emyName;
+        speed = 2;
         defaultSpeed = speed;
-        animationSpeed = 15;
+        animationSpeed = 5;
 
         // Collision attributes
-        hitbox = new Rectangle(8, 16, 32, 32);
+        hitbox = new Rectangle(2, 18, 44, 30);
         hitboxDefaultX = hitbox.x;
         hitboxDefaultY = hitbox.y;
         hitboxDefaultWidth = hitbox.width;
@@ -45,15 +43,9 @@ public class NPC_OldMan extends Entity {
      * Fetches sprites
      * Called by constructor in Entity parent class
      */
-    protected void getImages() {
-        up1 = setupImage("/npc/oldman_up_1");
-        up2 = setupImage("/npc/oldman_up_2");
-        down1 = setupImage("/npc/oldman_down_1");
-        down2 = setupImage("/npc/oldman_down_2");
-        left1 = setupImage("/npc/oldman_left_1");
-        left2 = setupImage("/npc/oldman_left_2");
-        right1 = setupImage("/npc/oldman_right_1");
-        right2 = setupImage("/npc/oldman_right_2");
+    public void getImages() {
+        up1 = down1 = left1 = right1 = setupImage("/enemy/keese_down_1");
+        up2 = down2 = left2 = right2 = setupImage("/enemy/keese_down_2");
     }
 
     /**
@@ -61,7 +53,7 @@ public class NPC_OldMan extends Entity {
      * Updates the actions the entity will take
      * Called by update() in Entity parent class
      */
-    protected void setAction() {
-        setDirection(60);
+    public void setAction() {
+        setDirection(25);
     }
 }

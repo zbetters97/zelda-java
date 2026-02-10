@@ -108,12 +108,28 @@ public class UI {
         return new Color(0, 240, 0);
     }
 
-
     /**
      * DRAW DEBUG
      * UI for debug information
      */
     private void drawDebug() {
+
+        int x = 10;
+        int y = gp.tileSize * 6;
+        int lineHeight = 20;
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.PLAIN, 20));
+
+        // Draw coordinates
+        g2.drawString("WorldX: " + gp.player.worldX, x, y);
+        y += lineHeight;
+        g2.drawString("WorldY: " + gp.player.worldY, x, y);
+        y += lineHeight;
+        g2.drawString("Column: " + (gp.player.worldX + gp.player.hitbox.x) / gp.tileSize, x, y);
+        y += lineHeight;
+        g2.drawString("Row: " + (gp.player.worldY + gp.player.hitbox.y) / gp.tileSize, x, y);
+
         // Draw player hitbox
         g2.setColor(Color.RED);
         g2.drawRect(gp.player.screenX + gp.player.hitbox.x, gp.player.screenY + gp.player.hitbox.y,
