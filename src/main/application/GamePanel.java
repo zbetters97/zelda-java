@@ -194,7 +194,13 @@ public class GamePanel extends JPanel implements Runnable {
     private void updateEnemies() {
         for (int i = 0; i < enemy[0].length; i++) {
             if (enemy[currentMap][i] != null) {
-                enemy[currentMap][i].update();
+                if (enemy[currentMap][i].alive) {
+                    enemy[currentMap][i].update();
+                }
+                else {
+                    // Delete enemy if dead
+                    enemy[currentMap][i] = null;
+                }
             }
         }
     }

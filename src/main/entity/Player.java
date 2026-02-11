@@ -4,6 +4,7 @@ import application.GamePanel;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 import static application.GamePanel.Direction.*;
 
@@ -63,6 +64,9 @@ public class Player extends Entity {
         attackBox.width = 32;
         attackBox.height = 32;
 
+        attack = 1;
+
+        // Attack speed
         swingSpeed1 = 4;
         swingSpeed2 = 7;
         swingSpeed3 = 15;
@@ -427,6 +431,11 @@ public class Player extends Entity {
                 }
             }
 
+            Entity enemy = getEnemy(this);
+            if (enemy != null) {
+                damageEnemy(enemy, this, attack, 1);
+            }
+
             // Restore hitbox
             worldX = currentWorldX;
             worldY = currentWorldY;
@@ -445,6 +454,25 @@ public class Player extends Entity {
 
             attackCounter = 0;
             spinCharge = 0;
+        }
+    }
+
+    public void damageEnemy(Entity target, Entity attacker, int attack, int knockbackPower) {
+
+        if (target != null && !target.invincible) {
+            setKnockback(target, attacker, knockbackPower);
+
+            int damage = attack;
+            if (damage < 0) {
+                damage = 1;
+            }
+
+            target.health -= damage;
+            target.invincible = true;
+
+            if (target.health <= 0) {
+                target.alive = false;
+            }
         }
     }
 

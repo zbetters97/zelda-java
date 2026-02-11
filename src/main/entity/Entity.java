@@ -60,6 +60,16 @@ public class Entity {
     protected int swingSpeed2;
     protected int swingSpeed3;
 
+    /* RPG VALUES */
+    public boolean alive = true;
+    protected int health, maxHealth;
+    protected int attack;
+    protected boolean invincible;
+    protected int invincibleCounter = 0;
+    protected boolean knockback;
+    protected GamePanel.Direction knockbackDirection;
+    protected boolean dying;
+
     /* COLLISION VALUES */
     public boolean collisionOn = true;
     protected boolean canMove = true;
@@ -266,13 +276,40 @@ public class Entity {
         return direction;
     }
 
+    public Entity getEnemy(Entity entity) {
+
+        Entity enemy = null;
+
+        int enemyIndex = gp.cChecker.checkEntity(entity, gp.enemy);
+        if (enemyIndex != -1) {
+            enemy = gp.enemy[gp.currentMap][enemyIndex];
+        }
+
+        return enemy;
+    }
+
+    public void setKnockback(Entity target, Entity attacker, double knockbackPower) {
+        target.knockback = true;
+        target.knockbackDirection = attacker.direction;
+        // target.speed += (int) knockbackPower;
+    }
+
     /**
      * MANAGE VALUES
      * Resets or reassigns entity attributes
      * called at the end of update
      */
     protected void manageValues() {
+        // Shield after taking damage
+        if (invincible) {
+            invincibleCounter++;
 
+            // Refresh time
+            if (invincibleCounter > 45) {
+                invincibleCounter = 0;
+                invincible = false;
+            }
+        }
     }
 
     /**
