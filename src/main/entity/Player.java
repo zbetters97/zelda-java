@@ -62,8 +62,8 @@ public class Player extends Entity {
         hitboxDefaultHeight = hitbox.height;
 
         // Attack box
-        attackBox.width = 32;
-        attackBox.height = 32;
+        attackBox.width = 44;
+        attackBox.height = 42;
 
         attack = 1;
 
@@ -423,44 +423,7 @@ public class Player extends Entity {
         }
         else if (swingSpeed3 >= attackCounter) {
             attackNum = 3;
-
-            // Save X/Y
-            int currentWorldX = worldX;
-            int currentWorldY = worldY;
-
-            // Adjust X/Y
-            switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> {
-                    worldY -= attackBox.height + hitbox.y;
-                    hitbox.height = attackBox.height;
-                }
-                case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                    worldY += attackBox.height - hitbox.y;
-                    hitbox.height = attackBox.height;
-                }
-                case LEFT -> {
-                    worldX -= attackBox.width;
-                    hitbox.width = attackBox.width;
-                }
-                case RIGHT -> {
-                    worldX += attackBox.width - hitbox.y;
-                    hitbox.width = attackBox.width;
-                }
-            }
-
-            // Find enemy that intersects collision box
-            Entity enemy = getEnemy(this);
-
-            // Sword collides with enemy, apply damage
-            if (enemy != null && !enemy.invincible) {
-                damageEnemy(enemy, this, attack, 1);
-            }
-
-            // Restore hitbox
-            worldX = currentWorldX;
-            worldY = currentWorldY;
-            hitbox.width = hitboxDefaultWidth;
-            hitbox.height = hitboxDefaultHeight;
+            adjustSwingHitbox();
         }
         else {
             action = Action.IDLE;
@@ -477,7 +440,42 @@ public class Player extends Entity {
         }
     }
 
-    public void damageEnemy(Entity target, Entity attacker, int attack, int knockbackPower) {
+    private void adjustSwingHitbox() {
+
+        // Save X/Y
+        int currentWorldX = worldX;
+        int currentWorldY = worldY;
+
+        // Reposition X/Y and hitbox for slash
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> {
+                worldY -= attackBox.height + hitbox.y;
+                hitbox.height = attackBox.height;
+            }
+            case DOWN, DOWNLEFT, DOWNRIGHT -> {
+                worldY += attackBox.height - hitbox.y;
+                hitbox.height = attackBox.height;
+            }
+            case LEFT -> {
+                worldX -= attackBox.width;
+                hitbox.width = attackBox.width;
+            }
+            case RIGHT -> {
+                worldX += attackBox.width - hitbox.y;
+                hitbox.width = attackBox.width;
+            }
+        }
+
+        detectEnemyCollision();
+
+        // Restore hitbox
+        worldX = currentWorldX;
+        worldY = currentWorldY;
+        hitbox.width = hitboxDefaultWidth;
+        hitbox.height = hitboxDefaultHeight;
+    }
+
+    private void damageEnemy(Entity target, Entity attacker, int attack, int knockbackPower) {
 
         // Push enemy back
         setKnockback(target, attacker, knockbackPower);
@@ -588,22 +586,54 @@ public class Player extends Entity {
      * Called by spinning()
      */
     private void adjustSpinHitbox() {
-        // TODO: Adjust world X/Y to detect if enemies are in range of spin attack
+
+        // Save current X/Y
+        int currentWorldX = worldX;
+        int currentWorldY = worldY;
+
+        // Reposition X/Y and hitbox for spinning slash
         switch (direction) {
-            case UP, UPLEFT, UPRIGHT, DOWN, DOWNLEFT, DOWNRIGHT -> {
+            case UP, UPLEFT, UPRIGHT -> {
+                worldY -= attackBox.height + hitbox.y;
                 hitbox.height = attackBox.height;
                 hitbox.width *= 2;
             }
-            case LEFT, RIGHT -> {
+            case DOWN, DOWNLEFT, DOWNRIGHT -> {
+                worldX -= attackBox.width;
+                worldY += attackBox.height - hitbox.y;
+                hitbox.height = attackBox.height;
+                hitbox.width *= 2;
+            }
+            case LEFT -> {
+                worldX -= attackBox.width;
+                worldY -= attackBox.height;
+                hitbox.width = attackBox.width;
+                hitbox.height *= 2;
+            }
+            case RIGHT -> {
+                worldX += attackBox.width - hitbox.y;
                 hitbox.width = attackBox.width;
                 hitbox.height *= 2;
             }
         }
-        // TODO: Detect if enemies hit by spin attack
 
-        // TODO: Reset world X/Y
+        detectEnemyCollision();
+
+        // Reset X/Y and Hitbox
+        worldX = currentWorldX;
+        worldY = currentWorldY;
         hitbox.width = hitboxDefaultWidth;
         hitbox.height = hitboxDefaultHeight;
+    }
+
+    private void detectEnemyCollision() {
+        // Find enemy that intersects collision box
+        Entity enemy = getEnemy(this);
+
+        // Sword collides with enemy, apply damage
+        if (enemy != null && !enemy.invincible) {
+            damageEnemy(enemy, this, attack, 1);
+        }
     }
 
     /**

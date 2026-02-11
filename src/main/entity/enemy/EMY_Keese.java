@@ -26,10 +26,10 @@ public class EMY_Keese extends Entity {
 
         // General attributes
         name = emyName;
-        speed = 2;
+        speed = 0;
         defaultSpeed = speed;
         animationSpeed = 5;
-        health = 4;
+        health = 10;
 
         // Collision attributes
         hitbox = new Rectangle(2, 18, 44, 30);
