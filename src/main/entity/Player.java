@@ -48,6 +48,7 @@ public class Player extends Entity {
         super(gp);
 
         name = "Link";
+        health = 5;
 
         // Player position locked to center of screen
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
@@ -183,6 +184,12 @@ public class Player extends Entity {
      */
     public void update() {
 
+        if (knockback) {
+            handleKnockback();
+            manageValues();
+            return;
+        }
+
         // Allow A press only when Idle
         if (action == Action.IDLE) {
             handleActionInput();
@@ -219,6 +226,12 @@ public class Player extends Entity {
 
         // Check enemy collision
         gp.cChecker.checkEntity(this, gp.enemy);
+
+        // Player contacted enemy, take damage
+        Entity enemy = getEnemy(this);
+        if (enemy != null && !enemy.invincible) {
+            damagePlayer(enemy.attack);
+        }
     }
 
     /**
@@ -375,11 +388,15 @@ public class Player extends Entity {
      * Called by move()
      */
     public GamePanel.Direction getMoveDirection() {
-        if (action == Action.ROLLING || lockedOn) {
+        if (knockback) {
+            return knockbackDirection;
+        }
+        else if (action == Action.ROLLING || lockedOn) {
             return lockonDirection;
         }
-
-        return direction;
+        else {
+            return direction;
+        }
     }
 
     /**
@@ -658,7 +675,16 @@ public class Player extends Entity {
             coolDownCounter--;
         }
 
+        // Shield after taking damage
+        if (invincible) {
+            invincibleCounter++;
 
+            // 1 SECOND REFRESH TIME
+            if (invincibleCounter > 60) {
+                invincible = false;
+                invincibleCounter = 0;
+            }
+        }
     }
 
     /**
@@ -679,6 +705,10 @@ public class Player extends Entity {
             case ROLLING -> getRollingSprite();
             case GUARDING -> getGuardSprite();
         };
+
+        if (invincible) {
+           playHurtAnimation(g2);
+        }
 
         g2.drawImage(image, tempScreenX, tempScreenY, null);
 

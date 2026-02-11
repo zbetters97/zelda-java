@@ -64,7 +64,7 @@ public class Entity {
     public boolean alive = true;
     protected int health, maxHealth;
     protected int attack;
-    protected boolean invincible;
+    protected boolean invincible = false;
     protected int invincibleCounter = 0;
     protected boolean knockback;
     protected GamePanel.Direction knockbackDirection;
@@ -189,7 +189,11 @@ public class Entity {
         collisionOn = false;
 
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkPlayer(this);
+        boolean contactPlayer = gp.cChecker.checkPlayer(this);
+
+        if (contactPlayer) {
+            damagePlayer(attack);
+        }
     }
 
     /**
@@ -312,6 +316,8 @@ public class Entity {
     }
 
     protected void handleKnockback() {
+
+        collisionOn = false;
         checkCollision();
 
         // Don't knockback if collision
@@ -337,6 +343,27 @@ public class Entity {
             knockbackCounter = 0;
             speed = defaultSpeed;
         }
+    }
+
+    protected void damagePlayer(int attack) {
+
+        if (gp.player.invincible) {
+            return;
+        }
+
+        int damage = attack;
+
+        // Knockback player
+        setKnockback(gp.player, this, 1);
+
+        // Keep damage at or above 0
+        if (damage < 0) {
+            damage = 0;
+        }
+
+        // Damage player
+        gp.player.health -= damage;
+        gp.player.invincible = true;
     }
 
     /**
@@ -388,7 +415,7 @@ public class Entity {
             playHurtAnimation(g2);
         }
         // Dying animation
-        else if (dying) {
+        if (dying) {
             playDyingAnimation(g2);
         }
 
@@ -450,7 +477,7 @@ public class Entity {
         return worldY - gp.player.worldY + gp.player.screenY;
     }
 
-    private void playHurtAnimation(Graphics2D g2) {
+    protected void playHurtAnimation(Graphics2D g2) {
         if (invincibleCounter % 5 == 0) {
             changeAlpha(g2, 0.2f);
         }
@@ -465,7 +492,7 @@ public class Entity {
             changeAlpha(g2, 0.2f);
         }
 
-        if (dyingCounter > 40) {
+        if (dyingCounter >= 40) {
             alive = false;
         }
     }

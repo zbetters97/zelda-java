@@ -171,7 +171,9 @@ public record CollisionChecker(GamePanel gp) {
      * Checks if the given entity will collide with the player entity
      * @param entity Entity to check collision for
      */
-    public void checkPlayer(Entity entity) {
+    public boolean checkPlayer(Entity entity) {
+
+        boolean contactedPlayer = false;
 
         entity.hitbox.x = entity.worldX + entity.hitbox.x;
         entity.hitbox.y = entity.worldY + entity.hitbox.y;
@@ -186,12 +188,13 @@ public record CollisionChecker(GamePanel gp) {
             case RIGHT -> entity.hitbox.x += entity.speed;
             default -> {
                 entity.collisionOn = true;
-                return;
+                return false;
             }
         }
 
         if (entity.hitbox.intersects(gp.player.hitbox)) {
             entity.collisionOn = true;
+            contactedPlayer = true;
         }
 
         // Reset entity solid area
@@ -201,5 +204,7 @@ public record CollisionChecker(GamePanel gp) {
         // Reset player solid area
         gp.player.hitbox.x = gp.player.hitboxDefaultX;
         gp.player.hitbox.y = gp.player.hitboxDefaultY;
+
+        return contactedPlayer;
     }
 }
