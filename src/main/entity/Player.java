@@ -431,8 +431,11 @@ public class Player extends Entity {
                 }
             }
 
+            // Find enemy that intersects collision box
             Entity enemy = getEnemy(this);
-            if (enemy != null) {
+
+            // Sword collides with enemy, apply damage
+            if (enemy != null && !enemy.invincible) {
                 damageEnemy(enemy, this, attack, 1);
             }
 
@@ -459,20 +462,23 @@ public class Player extends Entity {
 
     public void damageEnemy(Entity target, Entity attacker, int attack, int knockbackPower) {
 
-        if (target != null && !target.invincible) {
-            setKnockback(target, attacker, knockbackPower);
+        // Push enemy back
+        setKnockback(target, attacker, knockbackPower);
 
-            int damage = attack;
-            if (damage < 0) {
-                damage = 1;
-            }
+        // Damage same as player attack value
+        int damage = attack;
 
-            target.health -= damage;
-            target.invincible = true;
+        // Keep damage above 0
+        if (damage < 0) {
+            damage = 1;
+        }
 
-            if (target.health <= 0) {
-                target.alive = false;
-            }
+        target.health -= damage;
+        target.invincible = true;
+
+        // Target lost all health, starting dying animation
+        if (target.health <= 0) {
+            target.dying = true;
         }
     }
 

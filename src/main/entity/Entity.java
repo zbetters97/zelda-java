@@ -68,7 +68,9 @@ public class Entity {
     protected int invincibleCounter = 0;
     protected boolean knockback;
     protected GamePanel.Direction knockbackDirection;
-    protected boolean dying;
+    protected int knockbackCounter = 0;
+    public boolean dying = false;
+    private int dyingCounter = 0;
 
     /* COLLISION VALUES */
     public boolean collisionOn = true;
@@ -154,8 +156,15 @@ public class Entity {
      * Called every frame by GamePanel
      */
     public void update() {
-        setAction();
-        updateDirection();
+
+        if (knockback) {
+            handleKnockback();
+        }
+        else {
+            setAction();
+            updateDirection();
+        }
+
         manageValues();
     }
 
@@ -273,10 +282,15 @@ public class Entity {
      * @return Current direction of the entity
      */
     public GamePanel.Direction getMoveDirection() {
-        return direction;
+        if (knockback) {
+            return knockbackDirection;
+        }
+        else {
+            return direction;
+        }
     }
 
-    public Entity getEnemy(Entity entity) {
+    protected Entity getEnemy(Entity entity) {
 
         Entity enemy = null;
 
@@ -288,10 +302,41 @@ public class Entity {
         return enemy;
     }
 
-    public void setKnockback(Entity target, Entity attacker, double knockbackPower) {
+    protected void setKnockback(Entity target, Entity attacker, int knockbackPower) {
         target.knockback = true;
+
+        // Direction attacker was facing when hit
         target.knockbackDirection = attacker.direction;
-        // target.speed += (int) knockbackPower;
+
+        target.speed += knockbackPower;
+    }
+
+    protected void handleKnockback() {
+        checkCollision();
+
+        // Don't knockback if collision
+        if (collisionOn) {
+            knockback = false;
+            knockbackCounter = 0;
+            speed = defaultSpeed;
+            return;
+        }
+
+        // Move in knockback direction
+        switch (knockbackDirection) {
+            case UP, UPLEFT, UPRIGHT -> worldY -= speed;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> worldY += speed;
+            case LEFT -> worldX -= speed;
+            case RIGHT -> worldX += speed;
+        }
+
+        // Run for 10 frames
+        knockbackCounter++;
+        if (knockbackCounter == 10) {
+            knockback = false;
+            knockbackCounter = 0;
+            speed = defaultSpeed;
+        }
     }
 
     /**
@@ -338,6 +383,16 @@ public class Entity {
             };
         }
 
+        // Flash sprite if hurt
+        if (invincible) {
+            playHurtAnimation(g2);
+        }
+        // Dying animation
+        else if (dying) {
+            playDyingAnimation(g2);
+        }
+
+        // Draw sprite
         g2.drawImage(image, tempScreenX, tempScreenY, null);
 
         // Draw hitbox (debug)
@@ -393,6 +448,26 @@ public class Entity {
      */
     public int getScreenY() {
         return worldY - gp.player.worldY + gp.player.screenY;
+    }
+
+    private void playHurtAnimation(Graphics2D g2) {
+        if (invincibleCounter % 5 == 0) {
+            changeAlpha(g2, 0.2f);
+        }
+    }
+
+    private void playDyingAnimation(Graphics2D g2) {
+
+        invincible = false;
+
+        dyingCounter++;
+        if (dyingCounter % 5 == 0) {
+            changeAlpha(g2, 0.2f);
+        }
+
+        if (dyingCounter > 40) {
+            alive = false;
+        }
     }
 
     /**
