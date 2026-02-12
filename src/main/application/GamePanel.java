@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -92,6 +93,7 @@ public class GamePanel extends JPanel implements Runnable {
     /**
      * SETUP GAME
      * Prepares the game with default settings
+     * Called by Driver
      */
     protected void setupGame() {
 
@@ -99,7 +101,7 @@ public class GamePanel extends JPanel implements Runnable {
         currentArea = outside;
         currentMap = 0;
 
-        // TEMP GAME WINDOW (before drawing to window)
+        // Temp game window (before drawing to window)
         tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
         g2 = (Graphics2D) tempScreen.getGraphics();
 
@@ -116,15 +118,16 @@ public class GamePanel extends JPanel implements Runnable {
     /**
      * SET FULL SCREEN
      * Changes the graphics to full screen mode
+     * Called by setupGame()
      */
     private void setFullScreen() {
 
-        // GET SYSTEM SCREEN
+        // Get system screen
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         gd.setFullScreenWindow(Driver.window);
 
-        // GET FULL SCREEN WIDTH AND HEIGHT
+        // Get full screen width and height
         screenWidth2 = Driver.window.getWidth();
         screenHeight2 = Driver.window.getHeight();
     }
@@ -132,15 +135,21 @@ public class GamePanel extends JPanel implements Runnable {
     /**
      * START GAME THREAD
      * Runs a new thread
+     * Called by Driver
      */
     protected void startGameThread() {
-        gameThread = new Thread(this); // new Thread with GamePanel class
-        gameThread.start(); // calls run() method
+
+        // New Thread with GamePanel class
+        gameThread = new Thread(this);
+
+        // Calls run() endlessly
+        gameThread.start();
     }
 
     /**
      * RUN
      * Draws and updates the game 60 times a second
+     * Called using the game thread start() method
      */
     @Override
     public void run() {
@@ -176,6 +185,7 @@ public class GamePanel extends JPanel implements Runnable {
     /**
      * UPDATE
      * Runs each time the frame is updated
+     * Called by run()
      */
     private void update() {
         player.update();
@@ -183,6 +193,7 @@ public class GamePanel extends JPanel implements Runnable {
         updateEnemies();
     }
 
+    /** UPDATERS **/
     private void updateNPCs() {
         for (int i = 0; i < npc[0].length; i++) {
             if (npc[currentMap][i] != null) {
@@ -190,7 +201,6 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
-
     private void updateEnemies() {
         for (int i = 0; i < enemy[0].length; i++) {
             if (enemy[currentMap][i] != null) {
@@ -209,12 +219,20 @@ public class GamePanel extends JPanel implements Runnable {
     /**
      * DRAW TO TEMP SCREEN
      * Draws to temporary screen before drawing to front-end
+     * Called by run()
      */
     private void drawToTempScreen() {
-        // DRAW TILES
-        tileM.draw(g2);
+        drawTiles();
+        drawEntities();
+        ui.draw(g2);
+    }
 
-        // DRAW ENTITIES
+    /** DRAW METHODS **/
+    private void drawTiles() {
+        tileM.draw(g2);
+    }
+    private void drawEntities() {
+
         entityList.add(player);
 
         // NPCs
@@ -231,18 +249,22 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
+        // Sort draw order by Y coordinate
+        entityList.sort(Comparator.comparingInt(e -> e.worldY));
+
+        // Draw all entities
         for (Entity e : entityList) {
             e.draw(g2);
         }
 
-        ui.draw(g2);
-
+        // Empty list
         entityList.clear();
     }
 
     /**
      * DRAW TO SCREEN
      * Draws graphics to screen
+     * Called by run()
      */
     private void drawToScreen() {
         Graphics g = getGraphics();

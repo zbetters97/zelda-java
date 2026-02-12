@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static application.GamePanel.Direction.*;
@@ -91,6 +92,11 @@ public class Entity {
     protected BufferedImage image, up1, up2,  down1, down2, left1, left2, right1, right2;
     protected int spriteNum = 1;
     protected int spriteCounter = 0;
+
+    /* ENTITY TYPES */
+    protected int entity_type;
+    protected final int type_npc = 0;
+    protected final int type_enemy = 1;
 
     /**
      * CONSTRUCTOR
@@ -196,8 +202,9 @@ public class Entity {
 
         gp.cChecker.checkTile(this);
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
+        boolean canHurtPlayer = entity_type == type_enemy;
 
-        if (contactPlayer) {
+        if (contactPlayer && canHurtPlayer) {
             damagePlayer(attack);
         }
     }

@@ -25,11 +25,12 @@ public class EMY_Keese extends Entity {
         worldYStart = this.worldY;
 
         // General attributes
+        entity_type = type_enemy;
         name = emyName;
-        speed = 0;
+        speed = 2;
         defaultSpeed = speed;
         animationSpeed = 5;
-        health = 10;
+        health = 4;
         attack = 1;
 
         // Collision attributes

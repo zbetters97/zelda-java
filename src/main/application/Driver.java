@@ -15,7 +15,7 @@ public class Driver {
 
         window = new JFrame();
 
-        // WINDOW PROPERTIES
+        // Window properties
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
         window.setTitle("Legend of Zelda");
@@ -24,17 +24,17 @@ public class Driver {
         GamePanel gamePanel = new GamePanel();
         window.add(gamePanel);
 
-        // LOAD SETTINGS
+        // Load settings
         if (gamePanel.fullScreenOn) {
             window.setUndecorated(true);
         }
 
-        // RESIZE WINDOW
+        // Resize window
         window.pack();
         window.setLocationRelativeTo(null);
         window.setVisible(true);
 
-        // START
+        // Start game thread
         gamePanel.setupGame();
         gamePanel.startGameThread();
     }
@@ -42,6 +42,7 @@ public class Driver {
     /**
      * SET ICON
      * Sets the game icon to triforce.png
+     * Called by main()
      */
     private void setGameIcon() {
         ImageIcon icon = new ImageIcon(Objects.requireNonNull(

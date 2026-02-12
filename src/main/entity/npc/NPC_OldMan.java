@@ -27,6 +27,7 @@ public class NPC_OldMan extends Entity {
         worldYStart = this.worldY;
 
         // General attributes
+        entity_type = type_npc;
         name = npcName;
         speed = 1;
         defaultSpeed = speed;
