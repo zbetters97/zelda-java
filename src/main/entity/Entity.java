@@ -12,6 +12,10 @@ import static application.GamePanel.Direction.*;
 
 public class Entity {
 
+    /**
+     * ACTION enum
+     * List of predefined actions an Entity can perform
+     */
     protected enum Action {
         IDLE(true, true),
         ATTACKING(false, false),
@@ -97,7 +101,7 @@ public class Entity {
         getImages();
     }
 
-    /* CHILD ONLY */
+    /* CHILD FUNCTIONS */
     /**
      * GET IMAGE
      */
@@ -107,7 +111,7 @@ public class Entity {
      * SET ACTION
      */
     protected void setAction() { }
-    /* END CHILD ONLY */
+    /* END CHILD FUNCTIONS */
 
     /**
      * SETUP IMAGE
@@ -158,6 +162,7 @@ public class Entity {
      */
     public void update() {
 
+        // No action if in knockback state
         if (knockback) {
             handleKnockback();
         }
@@ -295,6 +300,12 @@ public class Entity {
         }
     }
 
+    /**
+     * GET ENEMY
+     * Finds if the passed entity collides with an entity in gp.enemy
+     * @param entity Target to check for collision on
+     * @return An enemy that the target may be intersecting with
+     */
     protected Entity getEnemy(Entity entity) {
 
         Entity enemy = null;
@@ -307,6 +318,13 @@ public class Entity {
         return enemy;
     }
 
+    /**
+     * SET KNOCKBACK
+     * Starts the knockback animation on the target
+     * @param target Entity hit by knockback
+     * @param attacker Entity that provided the knockback
+     * @param knockbackPower Power of the knockback
+     */
     protected void setKnockback(Entity target, Entity attacker, int knockbackPower) {
         target.knockback = true;
 
@@ -316,6 +334,10 @@ public class Entity {
         target.speed += knockbackPower;
     }
 
+    /**
+     * HANDLE KNOCKBACK
+     * Runs the knockback animation
+     */
     protected void handleKnockback() {
 
         collisionOn = false;
@@ -346,16 +368,19 @@ public class Entity {
         }
     }
 
+    /**
+     * DAMAGE PLAYER
+     * Handles logic for damaging the player
+     * @param attack Attack value of the weapon used
+     */
     protected void damagePlayer(int attack) {
 
+        // Player can't be damaged
         if (gp.player.invincible) {
             return;
         }
 
         int damage = attack;
-
-        // Knockback player
-        setKnockback(gp.player, this, 1);
 
         // Keep damage at or above 0
         if (damage < 0) {
@@ -365,6 +390,9 @@ public class Entity {
         // Damage player
         gp.player.health -= damage;
         gp.player.invincible = true;
+
+        // Knockback player
+        setKnockback(gp.player, this, 1);
     }
 
     /**
@@ -478,12 +506,12 @@ public class Entity {
         return worldY - gp.player.worldY + gp.player.screenY;
     }
 
+    /** SPRITE ANIMATIONS **/
     protected void playHurtAnimation(Graphics2D g2) {
         if (invincibleCounter % 5 == 0) {
             changeAlpha(g2, 0.2f);
         }
     }
-
     private void playDyingAnimation(Graphics2D g2) {
 
         invincible = false;

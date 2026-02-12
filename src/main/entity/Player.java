@@ -442,6 +442,11 @@ public class Player extends Entity {
         }
     }
 
+    /**
+     * ADJUST SWING HITBOX
+     * Modifies hitbox to accommodate for slash attack
+     * Called by attacking()
+     */
     private void adjustSwingHitbox() {
 
         // Save X/Y
@@ -475,28 +480,6 @@ public class Player extends Entity {
         worldY = currentWorldY;
         hitbox.width = hitboxDefaultWidth;
         hitbox.height = hitboxDefaultHeight;
-    }
-
-    private void damageEnemy(Entity target, Entity attacker, int attack, int knockbackPower) {
-
-        // Push enemy back
-        setKnockback(target, attacker, knockbackPower);
-
-        // Damage same as player attack value
-        int damage = attack;
-
-        // Keep damage above 0
-        if (damage < 0) {
-            damage = 1;
-        }
-
-        target.health -= damage;
-        target.invincible = true;
-
-        // Target lost all health, starting dying animation
-        if (target.health <= 0) {
-            target.dying = true;
-        }
     }
 
     /**
@@ -628,14 +611,47 @@ public class Player extends Entity {
         hitbox.height = hitboxDefaultHeight;
     }
 
+    /**
+     * DETECT ENEMY COLLISION
+     * Checks if an enemy collides with the player's hitbox/attackBox
+     */
     private void detectEnemyCollision() {
         // Find enemy that intersects collision box
         Entity enemy = getEnemy(this);
 
         // Sword collides with enemy, apply damage
         if (enemy != null && !enemy.invincible) {
-            damageEnemy(enemy, this, attack, 1);
+            damageEnemy(enemy);
         }
+    }
+
+    /**
+     * DAMAGE ENEMY
+     * Handles logic when an enemy is hit by an attack
+     * Called by detectEnemyCollision()
+     * @param target Enemy being damaged
+     */
+    private void damageEnemy(Entity target) {
+
+        // Damage same as player attack value
+        int damage = attack;
+
+        // Keep damage above 0
+        if (damage < 0) {
+            damage = 1;
+        }
+
+        // Damage target
+        target.health -= damage;
+        target.invincible = true;
+
+        // Target lost all health, starting dying animation
+        if (target.health <= 0) {
+            target.dying = true;
+        }
+
+        // Push target back
+        setKnockback(target, this, 1);
     }
 
     /**

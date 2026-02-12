@@ -31,6 +31,7 @@ public class UI {
 
     /**
      * IMPORT FONT
+     * Called by Constructor
      */
     private void importFont() {
         try {
@@ -54,6 +55,7 @@ public class UI {
     /**
      * DRAW
      * Draws the UI
+     * Called by GamePanel
      * @param g2 Graphics2D enginge
      */
     public void draw(Graphics2D g2) {
@@ -69,6 +71,7 @@ public class UI {
     /**
      * DRAW HUD
      * Draws the HUD during playstate
+     * called by draw()
      */
     private void drawHUD() {
         drawPlayerHealth();
@@ -79,6 +82,7 @@ public class UI {
     /**
      * DRAW PLAYER HEALTH
      * Draws the current player's health in the top-left corner of the screen
+     * Called by drawHUD()
      */
     private void drawPlayerHealth() {
 
@@ -120,6 +124,7 @@ public class UI {
     /**
      * DRAW CHARGE BAR
      * Draws the spin attack charge bar
+     * Called by drawHUD()
      */
     private void drawChargeBar() {
 
@@ -160,6 +165,7 @@ public class UI {
     /**
      * GET CHARGE COLOR
      * Gets the color of the spin attack charge bar based on charge
+     * Called by drawChargeBar()
      * @param charge Current player charge value
      * @return The new color of the charge bar
      */
@@ -174,6 +180,7 @@ public class UI {
     /**
      * DRAW DEBUG
      * UI for debug information
+     * Called by drawHUD()
      */
     private void drawDebug() {
 
