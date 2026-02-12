@@ -62,7 +62,8 @@ public class Entity {
 
     /* RPG VALUES */
     public boolean alive = true;
-    protected int health, maxHealth;
+    public int health;
+    public int maxHealth;
     protected int attack;
     protected boolean invincible = false;
     protected int invincibleCounter = 0;

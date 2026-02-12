@@ -48,7 +48,8 @@ public class Player extends Entity {
         super(gp);
 
         name = "Link";
-        health = 5;
+        health = 16;
+        maxHealth = 16;
 
         // Player position locked to center of screen
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
@@ -183,6 +184,9 @@ public class Player extends Entity {
      * Called by GamePanel every frame
      */
     public void update() {
+
+        // Always check for collision
+        checkCollision();
 
         if (knockback) {
             handleKnockback();
@@ -375,8 +379,6 @@ public class Player extends Entity {
      * Called by updateDirection() if no collision
      */
     protected void move() {
-        checkCollision();
-
         GamePanel.Direction newDirection = getMoveDirection();
         super.move(newDirection);
     }

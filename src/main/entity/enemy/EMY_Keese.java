@@ -30,6 +30,7 @@ public class EMY_Keese extends Entity {
         defaultSpeed = speed;
         animationSpeed = 5;
         health = 10;
+        attack = 1;
 
         // Collision attributes
         hitbox = new Rectangle(2, 18, 44, 30);
